@@ -1,6 +1,21 @@
 import { csharpGenerator } from './generator_instance.js';
 import * as Blockly from 'blockly/core';
 
+export const ERROR_MESSAGE_STRING = '"Ошибка: несовместимые блоки"';
+
+/**
+ * Устанавливает предупреждение на блок и возвращает стандартный код ошибки.
+ * @param {Blockly.Block} block Блок, на котором произошла ошибка.
+ * @param {string} warningText Текст предупреждения для пользователя.
+ * @returns {[string, number]} Кортеж с кодом ошибки и приоритетом операции.
+ */
+function handleBlockError(block, warningText) {
+  // 1. Устанавливаем видимое предупреждение на блоке в интерфейсе
+  block.setWarningText(warningText);
+  // 2. Возвращаем стандартизированную строку ошибки для генератора
+  return [ERROR_MESSAGE_STRING, csharpGenerator.ORDER_ATOMIC];
+}
+
 // --- ЛОГИКА ---
 csharpGenerator.forBlock['controls_if'] = function(block) {
   let n = 0;
@@ -106,6 +121,46 @@ csharpGenerator.forBlock['math_number'] = function(block) {
 };
 
 csharpGenerator.forBlock['math_arithmetic'] = function(block) {
+  // Сбрасываем старое предупреждение
+  block.setWarningText(null);
+
+  /**
+   * Внутренняя функция для проверки одного входа (A или B).
+   * @param {string} inputName Имя входа ('A' или 'B').
+   * @returns {boolean} Возвращает true, если найдена ошибка.
+   */
+  const checkForError = (inputName) => {
+    const connectedBlock = block.getInputTargetBlock(inputName);
+    if (!connectedBlock) return false; // Нет блока - нет ошибки
+
+    // ПРОВЕРКА 1: Прямое подключение текста
+    if (connectedBlock.type === 'text') {
+      handleBlockError(block, 'Нельзя использовать текст в математических операциях.');
+      return true;
+    }
+    
+    // ПРОВЕРКА 2: Подключение текстовой переменной
+    if (connectedBlock.type === 'variables_get') {
+      const variable = block.workspace.getVariableById(connectedBlock.getFieldValue('VAR'));
+      const varName = csharpGenerator.variableDB_.getName(variable.name, 'VARIABLE');
+      const definitionKey = 'variables_' + varName;
+      const definition = csharpGenerator.definitions_[definitionKey];
+      
+      if (definition && definition.startsWith('string')) {
+        handleBlockError(block, `Переменная "${variable.name}" является текстом и не может использоваться в математике.`);
+        return true;
+      }
+    }
+    return false; // Ошибок не найдено
+  };
+
+  // Проверяем оба входа. Если хоть один выдает ошибку, прерываемся.
+  if (checkForError('A') || checkForError('B')) {
+    // handleBlockError уже был вызван внутри, так что просто возвращаем строку-ошибку
+    return [ERROR_MESSAGE_STRING, csharpGenerator.ORDER_ATOMIC];
+  }
+  
+  // --- Если ошибок нет, выполняем стандартную логику генерации ---
   const OPERATORS = {
     'ADD': [' + ', csharpGenerator.ORDER_ADDITIVE], 'MINUS': [' - ', csharpGenerator.ORDER_ADDITIVE],
     'MULTIPLY': [' * ', csharpGenerator.ORDER_MULTIPLICATIVE], 'DIVIDE': [' / ', csharpGenerator.ORDER_MULTIPLICATIVE],
@@ -235,13 +290,38 @@ csharpGenerator.forBlock['text_append'] = function(block) {
 };
 
 csharpGenerator.forBlock['text_length'] = function(block) {
-  const text = csharpGenerator.valueToCode(block, 'VALUE', csharpGenerator.ORDER_MEMBER) || '""';
-  return [`${text}.Length`, csharpGenerator.ORDER_MEMBER];
-};
+  // Сначала сбрасываем старое предупреждение
+  block.setWarningText(null);
 
-csharpGenerator.forBlock['text_isEmpty'] = function(block) {
-  const text = csharpGenerator.valueToCode(block, 'VALUE', csharpGenerator.ORDER_NONE) || '""';
-  return [`string.IsNullOrEmpty(${text})`, csharpGenerator.ORDER_MEMBER];
+  const valueBlock = block.getInputTargetBlock('VALUE');
+  
+  if (!valueBlock) {
+    // Ничего не подключено, возвращаем безопасный код
+    const text = csharpGenerator.valueToCode(block, 'VALUE', csharpGenerator.ORDER_MEMBER) || '""';
+    return [text + '.Length', csharpGenerator.ORDER_MEMBER];
+  }
+
+  // ПРОВЕРКА 1: Прямое подключение неверного типа
+  if (valueBlock.type === 'math_number' || valueBlock.type === 'logic_boolean') {
+    return handleBlockError(block, 'Нельзя получить длину числа или логического значения.');
+  }
+
+  // ПРОВЕРКА 2: Подключение переменной неверного типа
+  if (valueBlock.type === 'variables_get') {
+    const variable = block.workspace.getVariableById(valueBlock.getFieldValue('VAR'));
+    const varName = csharpGenerator.variableDB_.getName(variable.name, 'VARIABLE');
+    const definitionKey = 'variables_' + varName;
+    const definition = csharpGenerator.definitions_[definitionKey];
+    
+    // Проверяем строку объявления переменной
+    if (definition && (definition.startsWith('double') || definition.startsWith('int') || definition.startsWith('bool'))) {
+       return handleBlockError(block, `Переменная "${variable.name}" имеет числовой или логический тип и у нее нет свойства "длина".`);
+    }
+  }
+
+  // Если все проверки пройдены, генерируем стандартный код
+  const text = csharpGenerator.valueToCode(block, 'VALUE', csharpGenerator.ORDER_MEMBER) || '""';
+  return [text + '.Length', csharpGenerator.ORDER_MEMBER];
 };
 
 // --- СПИСКИ (предполагаем List<object> для универсальности) ---
