@@ -4,11 +4,10 @@ import React, { useRef, useState, useCallback, useMemo } from 'react';
 import BlocklyComponent from './components/BlocklyComponent';
 import CodeDisplay from './components/CodeDisplay';
 import { ColorPickerModal } from './components/ColorPickerModal';
-import FAQPage from './components/FAQPage'; // Убедитесь, что этот компонент создан
+import FAQPage from './components/FAQPage';
 import './App.css';
 
 import ConsolePanel from './console/ConsolePanel';
-
 
 // --- БЛОК ИНИЦИАЛИЗАЦИИ BLOCKLY ---
 import * as Blockly from 'blockly/core';
@@ -16,15 +15,14 @@ import 'blockly/blocks';
 import './fields/FieldReactColour.js';
 import './blocks/se_blocks.js';
 import './blocks/se_base_blocks.js';
-import './blocks/console_blocks.js'; // --- ИЗМЕНЕНИЕ: Добавлен импорт новых блоков
-import './generator/csharp/console_generator.js'; // --- ИЗМЕНЕНИЕ: Добавлен импорт нового генератора
+import './blocks/console_blocks.js';
+import './generator/csharp/console_generator.js';
 import { seToolbox, consoleToolbox } from './toolboxConfig';
+import { ERROR_MESSAGE_STRING } from './generator/standard_csharp_generator.js';
 import * as Ru from 'blockly/msg/ru';
 
 Blockly.setLocale(Ru);
 // --- КОНЕЦ БЛОКА ИНИЦИАЛИЗАЦИИ ---
-
-
 
 const SE_INITIAL_XML =
   '<xml xmlns="https://developers.google.com/blockly/xml">' +
@@ -35,19 +33,16 @@ const CONSOLE_INITIAL_XML =
   '  <block type="program_main" deletable="false" movable="false" x="50" y="50"></block>' +
   '</xml>';
 
-
-
 function App() {
   const [code, setCode] = useState('');
   const blocklyComponentRef = useRef(null);
   const [isPickerOpen, setPickerOpen] = useState(false);
   const [pickerInitialColor, setPickerInitialColor] = useState('#ffffff');
   const [pickerCallback, setPickerCallback] = useState(null);
-  const [showFaq, setShowFaq] = useState(false); // Состояние для показа FAQ
+  const [showFaq, setShowFaq] = useState(false);
+  const [copyButtonText, setCopyButtonText] = useState('Копировать');
+  const [mode, setMode] = useState('se');
 
-  const [mode, setMode] = useState('se'); // 'se' или 'console'
-
-  // --- ИЗМЕНЕНИЕ: "Умный калькулятор", который выбирает нужные настройки в зависимости от режима
   const { toolbox, initialXml } = useMemo(() => {
     if (mode === 'se') {
       return { toolbox: seToolbox, initialXml: SE_INITIAL_XML };
@@ -68,12 +63,30 @@ function App() {
     }
   };
 
-  const copyToClipboard = () => {
-    if (code) {
-      navigator.clipboard.writeText(code)
-        .then(() => alert('Код скопирован в буфер обмена!'))
-        .catch(err => console.error('Ошибка копирования: ', err));
-    }
+  // --- ИЗМЕНЕНИЕ: Функция копирования заменена на версию без 'confirm' для исправления ошибки ESLint ---
+  const handleCopyClick = () => {
+    // Просто копируем код. Визуальные предупреждения на блоках и в коде уже информируют пользователя.
+    navigator.clipboard.writeText(code)
+      .then(() => {
+        // Если в коде есть ошибка, кнопка покажет это, но код все равно скопируется.
+        if (code.includes(ERROR_MESSAGE_STRING)) {
+          setCopyButtonText('Скопировано с ошибками');
+        } else {
+          setCopyButtonText('Скопировано!');
+        }
+        
+        // Возвращаем текст обратно через 2 секунды
+        setTimeout(() => {
+          setCopyButtonText('Копировать');
+        }, 2000);
+      })
+      .catch(err => {
+        console.error('Ошибка копирования: ', err);
+        setCopyButtonText('Ошибка копирования!');
+         setTimeout(() => {
+          setCopyButtonText('Копировать');
+        }, 2000);
+      });
   };
 
   const handleSave = () => {
@@ -96,14 +109,10 @@ function App() {
     }
   };
   
-  // --- ИЗМЕНЕНИЕ 1: Добавляем условный рендеринг ---
   if (showFaq) {
-    // Если showFaq равно true, показываем только страницу FAQ
-    // и передаем ей функцию для возврата назад
     return <FAQPage onBack={() => setShowFaq(false)} />;
   }
 
-  // В противном случае, показываем основной интерфейс редактора
   return (
     <div className="App">
       <header className="app-header">
@@ -123,17 +132,19 @@ function App() {
             ref={blocklyComponentRef}
             onCodeChange={setCode}
             openReactColourPicker={openColorPicker}
-            // --- ИЗМЕНЕНИЕ: Используем динамические пропсы ---
             toolbox={toolbox}
             initialXml={initialXml}
-            // --- ИЗМЕНЕНИЕ: Ключ для полной перезагрузки Blockly при смене режима ---
             key={mode}
           />
         </div>
         <div className="code-wrapper">
           <div className="code-header">
             <h2>Сгенерированный код C#</h2>
-            {code && (<button onClick={copyToClipboard} className="copy-button">Копировать</button>)}
+            {code && (
+              <button onClick={handleCopyClick} className="copy-button">
+                {copyButtonText}
+              </button>
+            )}
           </div>
           <CodeDisplay code={code} />
            {mode === 'console' && <ConsolePanel csharpCode={code} />}
@@ -142,7 +153,6 @@ function App() {
       <div className="buttons-panel">
         <button onClick={handleSave}>Сохранить</button>
         <button onClick={handleLoad}>Загрузить</button>
-        {/* --- ИЗМЕНЕНИЕ 2: Кнопка теперь переключает состояние --- */}
         <button onClick={() => setShowFaq(true)}>Справка (FAQ)</button>
       </div>
 
