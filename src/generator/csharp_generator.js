@@ -1,4 +1,4 @@
-/// src/generator/csharp_generator.js
+// src/generator/csharp_generator.js
 
 // 1. Импортируем уже созданный экземпляр из нашего нового файла
 import { csharpGenerator } from './generator_instance.js';
@@ -71,7 +71,7 @@ csharpGenerator.quote_ = function(string) {
 };
 
 // 4. РЕГИСТРИРУЕМ ВСЕ НАБОРЫ ГЕНЕРАТОРОВ В ОДНОМ МЕСТЕ.
-registerStandardGenerators(csharpGenerator);
+
 registerSEGenerators(csharpGenerator);
 registerSEBaseGenerators(csharpGenerator);
 
