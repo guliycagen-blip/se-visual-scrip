@@ -1,19 +1,12 @@
-// src/generator/generator_instance.js // ПОЛНАЯ, ИСПРАВЛЕННАЯ ВЕРСИЯ
+// src/generator/generator_instance.js // ОБНОВЛЕННАЯ ВЕРСИЯ
 
 import * as Blockly from 'blockly/core';
 
 export const csharpGenerator = new Blockly.Generator('C#');
 
-// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ, КОТОРЫХ НЕ ХВАТАЛО ---
-
-/**
- * Initializes the database of variable names.
- * @param {!Blockly.Workspace} workspace Workspace to generate code from.
- */
 csharpGenerator.init = function(workspace) {
-  // Create a dictionary of definitions to be printed before the code.
+  // 1. Создаем пустые словари для определений и имен переменных (стандартный код)
   csharpGenerator.definitions_ = Object.create(null);
-  // Create a dictionary of variable names.
   if (!csharpGenerator.variableDB_) {
     csharpGenerator.variableDB_ =
         new Blockly.Names(csharpGenerator.RESERVED_WORDS_);
@@ -21,25 +14,31 @@ csharpGenerator.init = function(workspace) {
     csharpGenerator.variableDB_.reset();
   }
   csharpGenerator.variableDB_.setVariableMap(workspace.getVariableMap());
+
+  // --- НАЧАЛО НАШЕГО НОВОГО КОДА ---
+  // 2. Пробегаемся по ВСЕМ переменным, которые есть в рабочей области
+  const variables = workspace.getVariableMap().getAllVariables();
+  if (variables.length) {
+    for (let i = 0; i < variables.length; i++) {
+      const variable = variables[i];
+      const varName = csharpGenerator.variableDB_.getName(variable.getId(), Blockly.Variables.NAME_TYPE);
+      
+      // 3. Добавляем для каждой переменной объявление по умолчанию.
+      // Тип 'object' - это безопасный базовый тип.
+      // Логика в 'variables_set' позже заменит это на более конкретный тип (double, string и т.д.)
+      csharpGenerator.definitions_['variables_' + varName] = `object ${varName};`;
+    }
+  }
+  // --- КОНЕЦ НАШЕГО НОВОГО КОДА ---
 };
 
-/**
- * Prepend the generated code with the variable definitions.
- * @param {string} code Generated code.
- * @return {string} Completed code.
- */
 csharpGenerator.finish = function(code) {
-  // Convert the definitions dictionary into a list.
   const definitions = Object.values(csharpGenerator.definitions_);
-  return definitions.join('\n\n') + '\n\n\n' + code;
+  // Убираем дубликаты, если они вдруг появятся
+  const uniqueDefinitions = [...new Set(definitions)];
+  return uniqueDefinitions.join('\n') + '\n\n' + code;
 };
 
-/**
- * Naked values are generated as literals.
- * This is unlikely to be wanted, so warn.
- * @param {string} line Line of generated code.
- * @return {string} Legal line of code.
- */
 csharpGenerator.scrub_ = function(block, code, thisOnly) {
     const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
     let nextCode = '';
@@ -49,22 +48,14 @@ csharpGenerator.scrub_ = function(block, code, thisOnly) {
     return code + nextCode;
 };
 
-/**
- * Enclose the provided string in C#-style quotes.
- * @param {string} string The string to enclose in quotes.
- * @return {string} The quoted string.
- * @protected
- */
 csharpGenerator.quote_ = function(string) {
-  // TODO: This is a quick hack. It may need to be more robust.
-  // C# strings use @ to indicate verbatim strings, which simplifies escaping.
   string = string.replace(/"/g, '""');
   return '@"' + string + '"';
 };
 
-// --- КОНСТАНТЫ ПРИОРИТЕТА ОПЕРАЦИЙ (ORDER), КОТОРЫЕ УЖЕ БЫЛИ ---
-
+// ... КОНСТАНТЫ ПРИОРИТЕТА ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ ...
 csharpGenerator.ORDER_ATOMIC = 0;
+// ... и так далее ...
 csharpGenerator.ORDER_MEMBER = 2;
 csharpGenerator.ORDER_UNARY_POSTFIX = 3;
 csharpGenerator.ORDER_UNARY_PREFIX = 4;
