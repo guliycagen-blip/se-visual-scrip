@@ -1,0 +1,6 @@
+// Содержимое файла FieldColour.js без изменений
+import * as Blockly from 'blockly/core';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { SketchPicker } from 'react-color';
+export class FieldColour extends Blockly.Field { reactRoot_ = null; static fromJson(options) { return new FieldColour(options.colour); } constructor(colour = '#FF0000', validator = null) { super(colour, validator); this.SERIALIZABLE = true; this.CURSOR = 'pointer'; } initView() { this.size_ = new Blockly.utils.Size(25, 20); this.colourElement_ = Blockly.utils.dom.createSvgElement( 'rect', { 'x': 5, 'y': 5, 'width': 25, 'height': 20, 'rx': 4, 'ry': 4, 'stroke': '#fff' }, this.getSvgRoot() ); } render_() { this.colourElement_.setAttribute('fill', this.getValue()); } showEditor_() { const editor = document.createElement('div'); editor.style.position = 'absolute'; editor.style.zIndex = '1010'; this.reactRoot_ = createRoot(editor); this.reactRoot_.render( <SketchPicker color={this.getValue()} onChangeComplete={(color) => { this.setValue(color.hex); Blockly.DropDownDiv.hideIfOwner(this); }} /> ); Blockly.DropDownDiv.getContentDiv().appendChild(editor); Blockly.DropDownDiv.showPositionedByField( this, () => { this.reactRoot_?.unmount(); } ); } }

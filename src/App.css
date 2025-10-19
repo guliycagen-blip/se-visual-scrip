@@ -1,0 +1,30 @@
+/* Содержимое файла App.css без изменений */
+body, html, #root { margin: 0; padding: 0; height: 100%; font-family: sans-serif; }
+.App { display: flex; flex-direction: column; height: 100vh; background-color: #2d2d2d; color: white; }
+.main-container { display: flex; flex-grow: 1; overflow: hidden; }
+.blockly-wrapper { flex: 1; height: 100%; border-right: 2px solid #444; }
+.code-wrapper { flex: 1; height: 100%; background-color: #1e1e1e; padding: 10px; box-sizing: border-box; overflow: auto; display: flex; flex-direction: column; }
+.code-wrapper pre { margin: 0; white-space: pre-wrap; word-break: break-all; flex-grow: 1; overflow-y: auto; }
+.buttons-panel { padding: 10px; background-color: #333; border-top: 2px solid #444; display: flex; justify-content: flex-start; }
+.buttons-panel button { margin-right: 10px; padding: 8px 16px; border: 1px solid #666; background-color: #555; color: white; cursor: pointer; border-radius: 4px; transition: background-color 0.2s; }
+.buttons-panel button:hover { background-color: #6a6a6a; }
+.code-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.code-header h2 { margin: 0; font-size: 1.1em; }
+.copy-button { padding: 6px 12px; font-size: 0.9em; border: 1px solid #5C81A6; background-color: #5C81A6; color: white; cursor: pointer; border-radius: 4px; transition: background-color 0.2s ease-in-out; }
+.copy-button:hover { background-color: #4a6b8b; border-color: #4a6b8b; }
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+}
+.mode-switcher { display: flex; gap: 10px; }
+.mode-switcher button {
+  padding: 8px 16px; border: 1px solid #ccc; background-color: #555;
+  color: white; cursor: pointer; border-radius: 4px;
+}
+.mode-switcher button.active {
+  background-color: #007bff; border-color: #007bff;
+}

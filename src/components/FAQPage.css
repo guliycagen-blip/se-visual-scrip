@@ -1,0 +1,120 @@
+/* src/components/FAQPage.css */
+
+.faq-page {
+  font-family: sans-serif;
+  color: #333;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.faq-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #fff;
+  margin-right: 20px;
+}
+.back-button:hover {
+  background-color: #f0f0f0;
+}
+
+.faq-header h1 {
+  margin: 0;
+}
+
+.faq-content {
+  display: flex;
+}
+
+.faq-nav {
+  flex: 0 0 200px;
+  margin-right: 30px;
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+}
+
+.faq-nav h3 {
+  margin-top: 0;
+}
+
+.faq-nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.faq-nav li a {
+  text-decoration: none;
+  color: #007bff;
+  display: block;
+  padding: 8px 0;
+}
+.faq-nav li a:hover {
+  text-decoration: underline;
+}
+
+.faq-main {
+  flex: 1;
+}
+
+.faq-category {
+  margin-bottom: 40px;
+}
+
+.faq-block {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.faq-block h3 {
+  margin-top: 0;
+  color: #9d5db0; /* Цвет как у блоков */
+}
+
+.block-screenshot, .block-screenshot-example {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.faq-block h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.faq-block ul {
+    padding-left: 20px;
+}
+
+.faq-block li {
+    margin-bottom: 8px;
+}
+
+pre {
+  background-color: #2d2d2d;
+  color: #f0f0f0;
+  padding: 15px;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: "Courier New", Courier, monospace;
+}

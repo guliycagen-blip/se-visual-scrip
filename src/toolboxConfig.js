@@ -1,0 +1,60 @@
+// src/toolboxConfig.js
+
+// Этот файл экспортирует единый, полный объект конфигурации
+// для панели инструментов Blockly в формате JSON.
+
+export const seToolbox = {
+  kind: 'categoryToolbox',
+  contents: [
+    // ... (весь ваш длинный список категорий остается здесь без изменений) ...
+    { kind: 'category', name: 'Логика', colour: '%{BKY_LOGIC_HUE}', contents: [ { kind: 'block', type: 'controls_if' }, { kind: 'block', type: 'logic_compare' }, { kind: 'block', type: 'logic_operation' }, { kind: 'block', type: 'logic_negate' }, { kind: 'block', type: 'logic_boolean' }, { kind: 'block', type: 'logic_null' } ] },
+    { kind: 'category', name: 'Циклы', colour: '%{BKY_LOOPS_HUE}', contents: [ { kind: 'block', type: 'controls_repeat_ext' }, { kind: 'block', type: 'controls_whileUntil' }, { kind: 'block', type: 'controls_for' }, { kind: 'block', type: 'controls_forEach' }, { kind: 'block', type: 'controls_flow_statements' } ] },
+    { kind: 'category', name: 'Математика', colour: '%{BKY_MATH_HUE}', contents: [ { kind: 'block', type: 'math_number' }, { kind: 'block', type: 'math_arithmetic' }, { kind: 'block', type: 'math_single' }, { kind: 'block', type: 'math_trig' }, { kind: 'block', type: 'math_constant' }, { kind: 'block', type: 'math_round' }, { kind: 'block', type: 'math_modulo' }, { kind: 'block', type: 'math_change' } ] },
+    { kind: 'category', name: 'Текст', colour: '%{BKY_TEXTS_HUE}', contents: [ { kind: 'block', type: 'text' }, { kind: 'block', type: 'text_join' }, { kind: 'block', type: 'text_append' }, { kind: 'block', type: 'text_length' }, { kind: 'block', type: 'text_isEmpty' } ] },
+    { kind: 'category', name: 'Списки', colour: '%{BKY_LISTS_HUE}', contents: [ { kind: 'block', type: 'lists_create_with' }, { kind: 'block', type: 'lists_repeat' }, { kind: 'block', type: 'lists_length' }, { kind: 'block', type: 'lists_isEmpty' }, { kind: 'block', type: 'lists_getIndex' }, { kind: 'block', type: 'lists_setIndex' } ] },
+    { kind: 'sep' },
+    { kind: 'category', name: 'Переменные', colour: '%{BKY_VARIABLES_HUE}', custom: 'VARIABLE' },
+    { kind: 'category', name: 'Функции', colour: '%{BKY_PROCEDURES_HUE}', custom: 'PROCEDURE' },
+    { kind: 'sep' },
+    { kind: 'category', name: 'SE: Общие', colour: '#5C81A6', contents: [ { kind: 'block', type: 'se_get_typed_block_by_name' }, { kind: 'block', type: 'se_get_blocks_of_type' }, { kind: 'block', type: 'se_get_blocks_in_group' }, { kind: 'block', type: 'se_me' }, { kind: 'block', type: 'se_grid_get_property' }, { kind: 'block', type: 'se_get_block_position' }, { kind: 'block', type: 'se_is_block_found' }, { kind: 'block', type: 'se_set_enabled' }, { kind: 'block', type: 'se_set_use_conveyor' }, { kind: 'block', type: 'se_get_block_property_boolean' }, { kind: 'block', type: 'se_echo' }, { kind: 'block', type: 'se_program_argument' }, { kind: 'block', type: 'se_set_update_frequency' }, { kind: 'block', type: 'se_storage_write' }, { kind: 'block', type: 'se_storage_read' }, ] },
+    { kind: 'category', name: 'SE: Механизмы', colour: '#ADA358', contents: [ { kind: 'label', text: 'Поршни' }, { kind: 'block', type: 'se_piston_set_velocity' }, { kind: 'block', type: 'se_piston_change_limit' }, { kind: 'block', type: 'se_piston_get_position' }, { kind: 'block', type: 'se_piston_get_status' }, { kind: 'label', text: 'Роторы' }, { kind: 'block', type: 'se_rotor_set_velocity' }, { kind: 'block', type: 'se_rotor_set_limits' }, { kind: 'block', type: 'se_rotor_get_angle' }, { kind: 'label', text: 'Шасси и Коннекторы' }, { kind: 'block', type: 'se_landing_gear_lock_unlock' }, { kind: 'block', type: 'se_landing_gear_get_status' }, { kind: 'block', type: 'se_connector_lock_unlock' }, { kind: 'block', type: 'se_connector_get_status' }, ] },
+    { kind: 'category', name: 'SE: Движение', colour: '#c28557', contents: [ { kind: 'label', text: 'Двигатели' }, { kind: 'block', type: 'se_thruster_set_override' }, { kind: 'block', type: 'se_thruster_get_thrust' }, { kind: 'label', text: 'Гироскопы' }, { kind: 'block', type: 'se_gyro_set_override' }, { kind: 'block', type: 'se_gyro_set_rotation' }, { kind: 'block', type: 'se_get_block_direction' }, { kind: 'label', text: 'Кокпиты' }, { kind: 'block', type: 'se_controller_is_under_control' }, { kind: 'block', type: 'se_controller_get_gravity' }, { kind: 'block', type: 'se_controller_get_input' }, ] },
+    { kind: 'category', name: 'SE: Инвентарь', colour: '#7c9dbe', contents: [ { kind: 'block', type: 'se_inventory_get_fill_percent' }, { kind: 'block', type: 'se_inventory_get_item_amount' }, { kind: 'block', type: 'se_inventory_transfer_item' }, ] },
+    { kind: 'category', name: 'SE: Производство', colour: '#a6815c', contents: [ { kind: 'block', type: 'se_assembler_add_to_queue' }, { kind: 'block', type: 'se_assembler_get_queue_amount' }, { kind: 'block', type: 'se_assembler_set_repeating' }, { kind: 'block', type: 'se_production_is_working' }, ] },
+    { kind: 'category', name: 'SE: Энергия', colour: '#c2c257', contents: [ { kind: 'block', type: 'se_battery_get_charge' }, { kind: 'block', type: 'se_battery_get_input' }, { kind: 'block', type: 'se_battery_set_charge_mode' }, { kind: 'block', type: 'se_power_get_output' }, { kind: 'block', type: 'se_power_get_max_output' }, ] },
+    { kind: 'category', name: 'SE: Освещение', colour: '#7c9dbe', contents: [ { kind: 'block', type: 'se_light_set_color' }, { kind: 'block', type: 'se_light_set_radius' }, { kind: 'block', type: 'se_light_set_intensity' } ] },
+    { kind: 'sep' },
+    { kind: 'category', name: 'SE: Дисплеи', colour: '#5BA5A5', contents: [ { kind: 'block', type: 'se_lcd_write_text' }, { kind: 'block', type: 'se_lcd_append_text' }, { kind: 'block', type: 'se_lcd_clear' }, { kind: 'block', type: 'se_lcd_set_font_size' }, { kind: 'block', type: 'se_lcd_set_color' }, ] },
+    { kind: 'category', name: 'SE: Камеры', colour: '#9d5db0', contents: [ { kind: 'block', type: 'se_camera_raycast' }, { kind: 'block', type: 'se_camera_raycast_is_valid' }, { kind: 'block', type: 'se_camera_raycast_get_property' }, ] },
+    { kind: 'category', name: 'SE: Сенсоры', colour: '#9d5db0', contents: [ { kind: 'block', type: 'se_sensor_get_last_detected' }, { kind: 'block', type: 'se_entity_info_is_empty' }, { kind: 'block', type: 'se_entity_info_get_property' }, ] },
+    { kind: 'category', name: 'SE: Таймеры', colour: '#f2a13d', contents: [ { kind: 'block', type: 'se_timer_control' }, { kind: 'block', type: 'se_timer_set_delay' }, { kind: 'block', type: 'se_timer_is_counting_down' }, ] },
+    { kind: 'category', name: 'SE: Векторы', colour: '#5DB05D', contents: [ { kind: 'label', text: 'Создание векторов' }, { kind: 'block', type: 'se_vector_create' }, { kind: 'block', type: 'se_gps_to_vector' }, { kind: 'sep' }, { kind: 'label', text: 'Операции с векторами' }, { kind: 'block', type: 'se_vector_math_op' }, { kind: 'block', type: 'se_vector_normalize' }, { kind: 'sep' }, { kind: 'label', text: 'Получение данных' }, { kind: 'block', type: 'se_vector_get_component' }, { kind: 'block', type: 'se_vector_get_length' }, { kind: 'block', type: 'se_vector_distance' }, { kind: 'block', type: 'se_vector_dot_product' }, { kind: 'sep' }, { kind: 'label', text: '2D Векторы' }, { kind: 'block', type: 'se_vector2d_create' }, { kind: 'block', type: 'se_vector2d_get_component' }, ] },
+    { kind: 'category', name: 'SE: Оружие', colour: '#b36262', contents: [ { kind: 'block', type: 'se_weapon_shoot_toggle' }, { kind: 'block', type: 'se_weapon_shoot_once' }, { kind: 'block', type: 'se_weapon_get_ammo' }, { kind: 'block', type: 'se_weapon_is_shooting' }, ] },
+  ]
+};
+
+// --- КОНСОЛЬНЫЙ ТУЛБОКС ---
+
+export const consoleToolbox = {
+  "kind": "categoryToolbox",
+  "contents": [
+    // Новый блок для точки входа в программу
+    {
+      "kind": "category",
+      "name": "Программа",
+      "colour": "#5b6770",
+      "contents": [
+        { "kind": "block", "type": "program_main" }
+      ]
+    },
+    // Стандартные категории, которые нужны для C#
+    { kind: 'category', name: 'Логика', colour: '%{BKY_LOGIC_HUE}', contents: [ { kind: 'block', type: 'controls_if' }, { kind: 'block', type: 'logic_compare' }, { kind: 'block', type: 'logic_operation' }, { kind: 'block', type: 'logic_negate' }, { kind: 'block', type: 'logic_boolean' }, { kind: 'block', type: 'logic_null' } ] },
+    { kind: 'category', name: 'Циклы', colour: '%{BKY_LOOPS_HUE}', contents: [ { kind: 'block', type: 'controls_repeat_ext' }, { kind: 'block', type: 'controls_whileUntil' }, { kind: 'block', type: 'controls_for' }, { kind: 'block', type: 'controls_forEach' }, { kind: 'block', type: 'controls_flow_statements' } ] },
+    { kind: 'category', name: 'Математика', colour: '%{BKY_MATH_HUE}', contents: [ { kind: 'block', type: 'math_number' }, { kind: 'block', type: 'math_arithmetic' }, { kind: 'block', type: 'math_single' }, { kind: 'block', type: 'math_trig' }, { kind: 'block', type: 'math_constant' }, { kind: 'block', type: 'math_round' }, { kind: 'block', type: 'math_modulo' }, { kind: 'block', type: 'math_change' } ] },
+    { kind: 'category', name: 'Текст', colour: '%{BKY_TEXTS_HUE}', contents: [ { kind: 'block', type: 'text' }, { kind: 'block', type: 'text_join' }, { kind: 'block', type: 'text_append' }, { kind: 'block', type: 'text_length' }, { kind: 'block', type: 'text_isEmpty' } ] },
+    { kind: 'category', name: 'Списки', colour: '%{BKY_LISTS_HUE}', contents: [ { kind: 'block', type: 'lists_create_with' }, { kind: 'block', type: 'lists_repeat' }, { kind: 'block', type: 'lists_length' }, { kind: 'block', type: 'lists_isEmpty' }, { kind: 'block', type: 'lists_getIndex' }, { kind: 'block', type: 'lists_setIndex' } ] },
+    { kind: 'sep' },
+    { kind: 'category', name: 'Переменные', colour: '%{BKY_VARIABLES_HUE}', custom: 'VARIABLE' },
+    { kind: 'category', name: 'Функции', colour: '%{BKY_PROCEDURES_HUE}', custom: 'PROCEDURE' },
+  ]
+};
