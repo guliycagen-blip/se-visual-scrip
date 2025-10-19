@@ -21,7 +21,7 @@ csharpGenerator.init = function(workspace) {
   if (variables.length) {
     for (let i = 0; i < variables.length; i++) {
       const variable = variables[i];
-      const varName = csharpGenerator.variableDB_.getName(variable.getId(), Blockly.Variables.NAME_TYPE);
+      const varName = csharpGenerator.variableDB_.getName(variable.name, 'VARIABLE');
       
       // 3. Добавляем для каждой переменной объявление по умолчанию.
       // Тип 'object' - это безопасный базовый тип.
