@@ -1,4 +1,4 @@
-/ src/generator/csharp_generator.js // ПРАВИЛЬНАЯ ВЕРСИЯ
+// src/generator/csharp_generator.js // ПРАВИЛЬНАЯ ВЕРСИЯ
 
 // 1. Импортируем уже созданный экземпляр из нашего нового файла
 import { csharpGenerator } from './generator_instance.js';
