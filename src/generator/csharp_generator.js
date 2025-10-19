@@ -1,16 +1,17 @@
-// src/generator/csharp_generator.js
+/// src/generator/csharp_generator.js
 
-import * as Blockly from 'blockly/core';
+// 1. Импортируем уже созданный экземпляр из нашего нового файла
+import { csharpGenerator } from './generator_instance.js';
 
-// 1. Создаем и экспортируем главный объект генератора
-export const csharpGenerator = new Blockly.Generator('CSharp');
-
-// 2. Подключаем все остальные файлы генераторов.
-// Они импортируют наш csharpGenerator и добавят в него свои блоки.
+// 2. Подключаем все остальные файлы, чтобы они "зарегистрировали" свои блоки.
+// Теперь они все будут импортировать csharpGenerator из одного и того же места.
 import './standard_csharp_generator.js';
 import './se_csharp_generator.js';
 import './se_csharp_base_generator.js';
-import './csharp/console_generator.js'; // Путь к console_generator правильный
+import './csharp/console_generator.js';
+
+// 3. Экспортируем генератор дальше, чтобы его можно было использовать в компонентах React
+export { csharpGenerator };
 // 2. Добавляем список зарезервированных слов.
 csharpGenerator.RESERVED_WORDS_ =
     'abstract,as,base,bool,break,byte,case,catch,char,checked,class,const,continue,decimal,default,delegate,do,double,else,enum,event,explicit,extern,false,finally,fixed,float,for,foreach,goto,if,implicit,in,int,interface,internal,is,lock,long,namespace,new,null,object,operator,out,override,params,private,protected,public,readonly,ref,return,sbyte,sealed,short,sizeof,stackalloc,static,string,struct,switch,this,throw,true,try,typeof,uint,ulong,unchecked,unsafe,ushort,using,virtual,void,volatile,while,' +

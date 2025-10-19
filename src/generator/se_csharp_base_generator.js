@@ -1,6 +1,7 @@
 // src/generator/se_csharp_base_generator.js
-// ИМПОРТИРУЕМ главный генератор
-import { csharpGenerator } from './csharp_generator.js';
+//  ИМПОРТИРУЕМ генератор из ЕДИНОГО источника
+import { csharpGenerator } from './generator_instance.js';
+
 
 export function registerSEBaseGenerators(generator) {
   generator.forBlock['se_variable_set'] = function(block, generator) {
