@@ -1,17 +1,17 @@
-// src/generator/se_csharp_generator.js
+// src/csharpGenerator/se_csharp_csharpGenerator.js
 
-export function registerSEGenerators(generator) {
+import { csharpGenerator } from './generator_instance.js';
 
     // --- ГЕНЕРАТОР СТРУКТУРЫ ---
-      // src/generator/se_csharp_generator.js
+      // src/csharpGenerator/se_csharp_csharpGenerator.js
 
 // ... (начало файла и другие генераторы) ...
 
-    generator.forBlock['se_program_structure'] = function(block, generator) {
+    csharpGenerator.forBlock['se_program_structure'] = function(block, csharpGenerator) {
       // 1. Собираем код из вложенных блоков, используя ПРАВИЛЬНЫЕ ИМЕНА ИЗ ВАШЕГО ИСХОДНОГО КОДА
-      const initCode = generator.statementToCode(block, 'INIT') || '';
-      const mainCode = generator.statementToCode(block, 'MAIN') || '';
-      const saveCode = generator.statementToCode(block, 'ON_SAVE') || '';
+      const initCode = csharpGenerator.statementToCode(block, 'INIT') || '';
+      const mainCode = csharpGenerator.statementToCode(block, 'MAIN') || '';
+      const saveCode = csharpGenerator.statementToCode(block, 'ON_SAVE') || '';
 
       // 2. Убираем лишние отступы, если код не пустой (этот код был правильным)
       const indent = '    ';
@@ -37,7 +37,7 @@ export function registerSEGenerators(generator) {
             const varType = v.type === 'Array' 
               ? 'List<IMyTerminalBlock>' 
               : (TYPE_MAP[v.type] || 'object');
-            return `${indent}${varType} ${generator.getVariableName(v.getId())};`;
+            return `${indent}${varType} ${csharpGenerator.getVariableName(v.getId())};`;
         })
         .filter(declaration => declaration !== null)
         .join('\n');
@@ -68,28 +68,28 @@ ${variableDeclarations}
 
     // ... (остальные ваши генераторы) ...
 
-    generator.forBlock['se_set_update_frequency'] = function(block, generator) {
+    csharpGenerator.forBlock['se_set_update_frequency'] = function(block, csharpGenerator) {
       const frequency = block.getFieldValue('FREQUENCY');
       return `Runtime.UpdateFrequency = UpdateFrequency.${frequency};\n`;
     };
 
     // --- ОБЩИЕ ГЕНЕРАТОРЫ ---
-    generator.forBlock['se_get_typed_block_by_name'] = function (block, generator) {
-        const blockName = generator.valueToCode(block, 'BLOCK_NAME', generator.ORDER_ATOMIC) || '""';
+    csharpGenerator.forBlock['se_get_typed_block_by_name'] = function (block, csharpGenerator) {
+        const blockName = csharpGenerator.valueToCode(block, 'BLOCK_NAME', csharpGenerator.ORDER_ATOMIC) || '""';
         const blockType = block.getFieldValue('BLOCK_TYPE');
         const code = `GridTerminalSystem.GetBlockWithName(${blockName}) as IMy${blockType}`;
-        return [code, generator.ORDER_FUNCTION_CALL];
+        return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_get_blocks_of_type'] = function (block, generator) {
+    csharpGenerator.forBlock['se_get_blocks_of_type'] = function (block, csharpGenerator) {
         const blockType = block.getFieldValue('BLOCK_TYPE');
         const fullTypeName = `IMy${blockType}`;
         const code = `new Func<List<${fullTypeName}>>(() => { var list = new List<${fullTypeName}>(); GridTerminalSystem.GetBlocksOfType<${fullTypeName}>(list); return list; })()`;
-        return [code, generator.ORDER_FUNCTION_CALL];
+        return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_get_blocks_in_group'] = function (block, generator) {
-        const groupName = generator.valueToCode(block, 'GROUP_NAME', generator.ORDER_ATOMIC) || '""';
+    csharpGenerator.forBlock['se_get_blocks_in_group'] = function (block, csharpGenerator) {
+        const groupName = csharpGenerator.valueToCode(block, 'GROUP_NAME', csharpGenerator.ORDER_ATOMIC) || '""';
         const code = `
 ((Func<List<IMyTerminalBlock>>)(() => {
     var list = new List<IMyTerminalBlock>();
@@ -97,47 +97,47 @@ ${variableDeclarations}
     if (group != null) group.GetBlocks(list);
     return list;
 }))()`.trim();
-        return [code, generator.ORDER_FUNCTION_CALL];
+        return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
     
-    generator.forBlock['se_is_block_found'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_is_block_found'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `(${blockCode} != null)`;
-      return [code, generator.ORDER_EQUALITY];
+      return [code, csharpGenerator.ORDER_EQUALITY];
     };
 
-    generator.forBlock['se_set_enabled'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const enabled = generator.valueToCode(block, 'ENABLED', generator.ORDER_ATOMIC) || 'false';
+    csharpGenerator.forBlock['se_set_enabled'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const enabled = csharpGenerator.valueToCode(block, 'ENABLED', csharpGenerator.ORDER_ATOMIC) || 'false';
         return `var b = (${blockCode}) as IMyFunctionalBlock; if (b != null) b.Enabled = ${enabled};\n`;
     };
     
-    generator.forBlock['se_set_use_conveyor'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-      const enabled = generator.valueToCode(block, 'ENABLED', generator.ORDER_ASSIGNMENT) || 'false';
+    csharpGenerator.forBlock['se_set_use_conveyor'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+      const enabled = csharpGenerator.valueToCode(block, 'ENABLED', csharpGenerator.ORDER_ASSIGNMENT) || 'false';
       const code = `var funcBlock = (${blockCode}) as IMyFunctionalBlock; if (funcBlock != null) funcBlock.UseConveyorSystem = ${enabled};\n`;
       return code;
     };
     
-    generator.forBlock['se_get_block_property_boolean'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_get_block_property_boolean'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const property = block.getFieldValue('PROPERTY');
       const code = `((${blockCode}) as IMyTerminalBlock)?.${property} ?? false`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_echo'] = function (block, generator) {
-        const text = generator.valueToCode(block, 'TEXT', generator.ORDER_ATOMIC) || '""';
+    csharpGenerator.forBlock['se_echo'] = function (block, csharpGenerator) {
+        const text = csharpGenerator.valueToCode(block, 'TEXT', csharpGenerator.ORDER_ATOMIC) || '""';
         return `Echo(${text}.ToString());\n`;
     };
 
-    generator.forBlock['se_program_argument'] = function (block) {
-        return ['argument', generator.ORDER_ATOMIC];
+    csharpGenerator.forBlock['se_program_argument'] = function (block) {
+        return ['argument', csharpGenerator.ORDER_ATOMIC];
     };
 
     // --- ГЕНЕРАТОРЫ ОСВЕЩЕНИЯ ---
-    generator.forBlock['se_light_set_color'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_light_set_color'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const color = block.getFieldValue('COLOR');
         const r = parseInt(color.substring(1, 3), 16);
         const g = parseInt(color.substring(3, 5), 16);
@@ -145,144 +145,144 @@ ${variableDeclarations}
         return `var l = (${blockCode}) as IMyLightingBlock; if (l != null) l.Color = new Color(${r}, ${g}, ${b});\n`;
     };
 
-    generator.forBlock['se_light_set_radius'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const radius = generator.valueToCode(block, 'RADIUS', generator.ORDER_ASSIGNMENT) || '10.0f';
+    csharpGenerator.forBlock['se_light_set_radius'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const radius = csharpGenerator.valueToCode(block, 'RADIUS', csharpGenerator.ORDER_ASSIGNMENT) || '10.0f';
         return `var l = (${blockCode}) as IMyLightingBlock; if (l != null) l.Radius = (float)(${radius});\n`;
     };
 
-    generator.forBlock['se_light_set_intensity'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const intensity = generator.valueToCode(block, 'INTENSITY', generator.ORDER_ASSIGNMENT) || '5.0f';
+    csharpGenerator.forBlock['se_light_set_intensity'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const intensity = csharpGenerator.valueToCode(block, 'INTENSITY', csharpGenerator.ORDER_ASSIGNMENT) || '5.0f';
         return `var l = (${blockCode}) as IMyLightingBlock; if (l != null) l.Intensity = (float)(${intensity});\n`;
     };
 
     // --- ГЕНЕРАТОРЫ МЕХАНИЗМОВ ---
-    generator.forBlock['se_piston_set_velocity'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-      const velocity = generator.valueToCode(block, 'VELOCITY', generator.ORDER_ASSIGNMENT) || '0';
+    csharpGenerator.forBlock['se_piston_set_velocity'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+      const velocity = csharpGenerator.valueToCode(block, 'VELOCITY', csharpGenerator.ORDER_ASSIGNMENT) || '0';
       return `var p = (${blockCode}) as IMyPistonBase; if (p != null) p.Velocity = (float)${velocity};\n`;
     };
 
-    generator.forBlock['se_piston_change_limit'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_piston_change_limit'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const limitType = block.getFieldValue('LIMIT_TYPE');
-        const value = generator.valueToCode(block, 'VALUE', generator.ORDER_ASSIGNMENT) || '0.0f';
+        const value = csharpGenerator.valueToCode(block, 'VALUE', csharpGenerator.ORDER_ASSIGNMENT) || '0.0f';
         return `var p = (${blockCode}) as IMyPistonBase; if (p != null) p.${limitType} = (float)(${value});\n`;
     };
 
-    generator.forBlock['se_piston_get_position'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_piston_get_position'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `((${blockCode}) as IMyPistonBase)?.CurrentPosition ?? 0.0f`;
-        return [code, generator.ORDER_MEMBER];
+        return [code, csharpGenerator.ORDER_MEMBER];
     };
     
-    generator.forBlock['se_piston_get_status'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_piston_get_status'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyPistonBase)?.Status.ToString() ?? "Unknown"`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_rotor_set_velocity'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const velocity = generator.valueToCode(block, 'VELOCITY', generator.ORDER_ASSIGNMENT) || '10.0f';
+    csharpGenerator.forBlock['se_rotor_set_velocity'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const velocity = csharpGenerator.valueToCode(block, 'VELOCITY', csharpGenerator.ORDER_ASSIGNMENT) || '10.0f';
         return `var r = (${blockCode}) as IMyMotorStator; if (r != null) r.TargetVelocityRPM = (float)(${velocity});\n`;
     };
 
-    generator.forBlock['se_rotor_set_limits'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-      const lower = generator.valueToCode(block, 'LOWER', generator.ORDER_ASSIGNMENT) || 'float.MinValue';
-      const upper = generator.valueToCode(block, 'UPPER', generator.ORDER_ASSIGNMENT) || 'float.MaxValue';
+    csharpGenerator.forBlock['se_rotor_set_limits'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+      const lower = csharpGenerator.valueToCode(block, 'LOWER', csharpGenerator.ORDER_ASSIGNMENT) || 'float.MinValue';
+      const upper = csharpGenerator.valueToCode(block, 'UPPER', csharpGenerator.ORDER_ASSIGNMENT) || 'float.MaxValue';
       return `var r = (${blockCode}) as IMyMotorStator; if (r != null) { r.LowerLimitDeg = (float)${lower}; r.UpperLimitDeg = (float)${upper}; }\n`;
     };
 
-    generator.forBlock['se_rotor_get_angle'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_rotor_get_angle'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `(((${blockCode}) as IMyMotorStator)?.Angle ?? 0.0f) * (180.0f / (float)Math.PI)`;
-        return [code, generator.ORDER_MULTIPLICATIVE];
+        return [code, csharpGenerator.ORDER_MULTIPLICATIVE];
     };
 
-    generator.forBlock['se_landing_gear_lock_unlock'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_landing_gear_lock_unlock'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const action = block.getFieldValue('ACTION');
       return `((${blockCode}) as IMyLandingGear)?.${action}();\n`;
     };
 
-    generator.forBlock['se_landing_gear_get_status'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_landing_gear_get_status'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyLandingGear)?.Status.ToString() ?? "Unknown"`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
     
-    generator.forBlock['se_connector_lock_unlock'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_connector_lock_unlock'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const action = block.getFieldValue('ACTION');
       return `((${blockCode}) as IMyShipConnector)?.ApplyAction("${action}");\n`;
     };
 
-    generator.forBlock['se_connector_get_status'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_connector_get_status'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyShipConnector)?.Status.ToString() ?? "Unknown"`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
     // --- ГЕНЕРАТОРЫ ДВИЖЕНИЯ ---
-     generator.forBlock['se_thruster_set_override'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const override = generator.valueToCode(block, 'OVERRIDE', generator.ORDER_ASSIGNMENT) || '0.0f';
+     csharpGenerator.forBlock['se_thruster_set_override'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const override = csharpGenerator.valueToCode(block, 'OVERRIDE', csharpGenerator.ORDER_ASSIGNMENT) || '0.0f';
         return `var t = (${blockCode}) as IMyThrust; if (t != null) t.ThrustOverridePercentage = (float)(${override}) / 100.0f;\n`;
     };
 
-     generator.forBlock['se_thruster_get_thrust'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+     csharpGenerator.forBlock['se_thruster_get_thrust'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `((${blockCode}) as IMyThrust)?.CurrentThrust ?? 0.0f`;
-        return [code, generator.ORDER_MEMBER];
+        return [code, csharpGenerator.ORDER_MEMBER];
     };
     
-    generator.forBlock['se_gyro_set_override'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-      const enabled = generator.valueToCode(block, 'ENABLED', generator.ORDER_ASSIGNMENT) || 'false';
+    csharpGenerator.forBlock['se_gyro_set_override'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+      const enabled = csharpGenerator.valueToCode(block, 'ENABLED', csharpGenerator.ORDER_ASSIGNMENT) || 'false';
       const code = `var gyro = (${blockCode}) as IMyGyro; if (gyro != null) gyro.GyroOverride = ${enabled};\n`;
       return code;
     };
 
-    generator.forBlock['se_gyro_set_rotation'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_gyro_set_rotation'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const axis = block.getFieldValue('AXIS');
-      const value = generator.valueToCode(block, 'VALUE', generator.ORDER_ASSIGNMENT) || '0';
+      const value = csharpGenerator.valueToCode(block, 'VALUE', csharpGenerator.ORDER_ASSIGNMENT) || '0';
       const code = `var gyro = (${blockCode}) as IMyGyro; if (gyro != null) gyro.${axis} = (float)(${value} * Math.PI / 180.0);\n`;
       return code;
     };
 
-    generator.forBlock['se_controller_is_under_control'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_controller_is_under_control'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyShipController)?.IsUnderControl ?? false`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_controller_get_gravity'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_controller_get_gravity'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyShipController)?.GetNaturalGravity() ?? Vector3D.Zero`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
     // --- ГЕНЕРАТОРЫ ИНВЕНТАРЯ ---
-    generator.forBlock['se_inventory_get_fill_percent'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_inventory_get_fill_percent'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `((Func<double>)(() => {
     var inv = (${blockCode})?.GetInventory(0);
     if (inv != null && (double)inv.MaxVolume > 0) return ((double)inv.CurrentVolume / (double)inv.MaxVolume) * 100.0;
     return 0.0;
 }))()`.trim();
-        return [code, generator.ORDER_FUNCTION_CALL];
+        return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_inventory_transfer_item'] = function(block, generator) {
-        const amount = generator.valueToCode(block, 'AMOUNT', generator.ORDER_ATOMIC) || '1';
-        const itemSubtype = generator.valueToCode(block, 'ITEM_SUBTYPE', generator.ORDER_ATOMIC) || '""';
+    csharpGenerator.forBlock['se_inventory_transfer_item'] = function(block, csharpGenerator) {
+        const amount = csharpGenerator.valueToCode(block, 'AMOUNT', csharpGenerator.ORDER_ATOMIC) || '1';
+        const itemSubtype = csharpGenerator.valueToCode(block, 'ITEM_SUBTYPE', csharpGenerator.ORDER_ATOMIC) || '""';
         const itemType = block.getFieldValue('ITEM_TYPE');
-        const sourceBlock = generator.valueToCode(block, 'FROM_BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const destBlock = generator.valueToCode(block, 'TO_BLOCK', generator.ORDER_ATOMIC) || 'null';
+        const sourceBlock = csharpGenerator.valueToCode(block, 'FROM_BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const destBlock = csharpGenerator.valueToCode(block, 'TO_BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `
 {
     var sourceEntity = (${sourceBlock}) as IMyEntity;
@@ -303,9 +303,9 @@ ${variableDeclarations}
         return code;
     };
 
-    generator.forBlock['se_inventory_get_item_amount'] = function(block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const itemSubtype = generator.quote_(block.getFieldValue('ITEM_TYPE'));
+    csharpGenerator.forBlock['se_inventory_get_item_amount'] = function(block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const itemSubtype = csharpGenerator.quote_(block.getFieldValue('ITEM_TYPE'));
         const code = `((Func<long>)(() => {
     var entity = (${blockCode}) as IMyEntity;
     if (entity == null || !entity.HasInventory) return 0;
@@ -313,14 +313,14 @@ ${variableDeclarations}
     var itemDefinition = MyDefinitionId.Parse("MyObjectBuilder_Component/" + ${itemSubtype});
     return (long)inventory.GetItemAmount(itemDefinition);
 }))()`;
-        return [code, generator.ORDER_ATOMIC];
+        return [code, csharpGenerator.ORDER_ATOMIC];
     };
 
     // --- ГЕНЕРАТОРЫ ПРОИЗВОДСТВА ---
-    generator.forBlock['se_assembler_add_to_queue'] = function(block, generator) {
-        const amount = generator.valueToCode(block, 'AMOUNT', generator.ORDER_ATOMIC) || '1';
-        const blueprintId = generator.quote_(block.getFieldValue('BLUEPRINT_ID'));
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_assembler_add_to_queue'] = function(block, csharpGenerator) {
+        const amount = csharpGenerator.valueToCode(block, 'AMOUNT', csharpGenerator.ORDER_ATOMIC) || '1';
+        const blueprintId = csharpGenerator.quote_(block.getFieldValue('BLUEPRINT_ID'));
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `
 {
     var asm = (${blockCode}) as IMyAssembler;
@@ -334,9 +334,9 @@ ${variableDeclarations}
         return code;
     };
 
-    generator.forBlock['se_assembler_get_queue_amount'] = function(block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-        const blueprintId = generator.quote_(block.getFieldValue('BLUEPRINT_ID'));
+    csharpGenerator.forBlock['se_assembler_get_queue_amount'] = function(block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+        const blueprintId = csharpGenerator.quote_(block.getFieldValue('BLUEPRINT_ID'));
         const code = `((Func<long>)(() => {
     var asm = (${blockCode}) as IMyAssembler;
     if (asm == null) return 0;
@@ -353,24 +353,24 @@ ${variableDeclarations}
     }
     return totalAmount;
 }))()`;
-        return [code, generator.ORDER_ATOMIC];
+        return [code, csharpGenerator.ORDER_ATOMIC];
     };
     
-    generator.forBlock['se_assembler_set_repeating'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-      const repeating = generator.valueToCode(block, 'REPEATING', generator.ORDER_ASSIGNMENT) || 'false';
+    csharpGenerator.forBlock['se_assembler_set_repeating'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+      const repeating = csharpGenerator.valueToCode(block, 'REPEATING', csharpGenerator.ORDER_ASSIGNMENT) || 'false';
       return `var asm = (${blockCode}) as IMyAssembler; if (asm != null) asm.Repeating = ${repeating};\n`;
     };
 
-    generator.forBlock['se_production_is_working'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_production_is_working'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `((${blockCode}) as IMyProductionBlock)?.IsWorking ?? false`;
-        return [code, generator.ORDER_MEMBER];
+        return [code, csharpGenerator.ORDER_MEMBER];
     };
 
     // --- ГЕНЕРАТОРЫ ЭНЕРГИИ ---
-    generator.forBlock['se_battery_get_charge'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_battery_get_charge'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const chargeType = block.getFieldValue('CHARGE_TYPE');
         let code = '0.0';
         switch (chargeType) {
@@ -380,7 +380,7 @@ ${variableDeclarations}
                     if (b == null || b.MaxStoredPower == 0) return 0.0;
                     return (b.CurrentStoredPower / b.MaxStoredPower) * 100.0;
                 }))()`.trim();
-                return [code, generator.ORDER_FUNCTION_CALL];
+                return [code, csharpGenerator.ORDER_FUNCTION_CALL];
             case 'CURRENT_MWH':
                 code = `((${blockCode}) as IMyBatteryBlock)?.CurrentStoredPower ?? 0.0f`;
                 break;
@@ -388,64 +388,64 @@ ${variableDeclarations}
                 code = `((${blockCode}) as IMyBatteryBlock)?.MaxStoredPower ?? 0.0f`;
                 break;
         }
-        return [code, generator.ORDER_MEMBER];
+        return [code, csharpGenerator.ORDER_MEMBER];
     };
     
-    generator.forBlock['se_battery_get_input'] = function(block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_battery_get_input'] = function(block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `((${blockCode}) as IMyBatteryBlock)?.CurrentInput ?? 0.0f`;
-        return [code, generator.ORDER_MEMBER];
+        return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_battery_set_charge_mode'] = function(block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_battery_set_charge_mode'] = function(block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const mode = block.getFieldValue('MODE');
         const code = `var batt = (${blockCode}) as IMyBatteryBlock; if (batt != null) batt.ChargeMode = ChargeMode.${mode};\n`;
         return code;
     };
 
-    generator.forBlock['se_power_get_output'] = function (block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_power_get_output'] = function (block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `((${blockCode}) as IMyPowerProducer)?.CurrentOutput ?? 0.0f`;
-        return [code, generator.ORDER_MEMBER];
+        return [code, csharpGenerator.ORDER_MEMBER];
     };
     
-    generator.forBlock['se_power_get_max_output'] = function(block, generator) {
-        const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_power_get_max_output'] = function(block, csharpGenerator) {
+        const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
         const code = `((${blockCode}) as IMyPowerProducer)?.MaxOutput ?? 0.0f`;
-        return [code, generator.ORDER_MEMBER];
+        return [code, csharpGenerator.ORDER_MEMBER];
     };
 
     // --- ГЕНЕРАТОРЫ ДИСПЛЕЕВ ---
-    generator.forBlock['se_lcd_write_text'] = function(block, generator) {
-      const text = generator.valueToCode(block, 'TEXT', generator.ORDER_ATOMIC) || '""';
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_lcd_write_text'] = function(block, csharpGenerator) {
+      const text = csharpGenerator.valueToCode(block, 'TEXT', csharpGenerator.ORDER_ATOMIC) || '""';
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyTextPanel)?.WriteText(${text}.ToString(), false);\n`;
       return code;
     };
 
-    generator.forBlock['se_lcd_append_text'] = function(block, generator) {
-      const text = generator.valueToCode(block, 'TEXT', generator.ORDER_ATOMIC) || '""';
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_lcd_append_text'] = function(block, csharpGenerator) {
+      const text = csharpGenerator.valueToCode(block, 'TEXT', csharpGenerator.ORDER_ATOMIC) || '""';
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyTextPanel)?.WriteText("\\n" + ${text}.ToString(), true);\n`;
       return code;
     };
 
-    generator.forBlock['se_lcd_clear'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_lcd_clear'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyTextPanel)?.WriteText("", false);\n`;
       return code;
     };
 
-    generator.forBlock['se_lcd_set_font_size'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-      const size = generator.valueToCode(block, 'SIZE', generator.ORDER_ASSIGNMENT) || '1.0';
+    csharpGenerator.forBlock['se_lcd_set_font_size'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+      const size = csharpGenerator.valueToCode(block, 'SIZE', csharpGenerator.ORDER_ASSIGNMENT) || '1.0';
       const code = `var panel = (${blockCode}) as IMyTextPanel; if (panel != null) panel.FontSize = (float)${size};\n`;
       return code;
     };
 
-    generator.forBlock['se_lcd_set_color'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_lcd_set_color'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const target = block.getFieldValue('TARGET');
       const color = block.getFieldValue('COLOR');
       const code = `var panel = (${blockCode}) as IMyTextPanel; if (panel != null) panel.${target} = Color.${color};\n`;
@@ -453,101 +453,101 @@ ${variableDeclarations}
     };
 
     // --- ГЕНЕРАТОРЫ СЕНСОРОВ ---
-    generator.forBlock['se_sensor_get_last_detected'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_sensor_get_last_detected'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMySensorBlock)?.LastDetectedEntity ?? new MyDetectedEntityInfo()`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_entity_info_is_empty'] = function(block, generator) {
-      const entityInfo = generator.valueToCode(block, 'ENTITY_INFO', generator.ORDER_ATOMIC) || 'new MyDetectedEntityInfo()';
+    csharpGenerator.forBlock['se_entity_info_is_empty'] = function(block, csharpGenerator) {
+      const entityInfo = csharpGenerator.valueToCode(block, 'ENTITY_INFO', csharpGenerator.ORDER_ATOMIC) || 'new MyDetectedEntityInfo()';
       const code = `${entityInfo}.IsEmpty()`;
-      return [code, generator.ORDER_FUNCTION_CALL];
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_entity_info_get_property'] = function(block, generator) {
-      const entityInfo = generator.valueToCode(block, 'ENTITY_INFO', generator.ORDER_ATOMIC) || 'new MyDetectedEntityInfo()';
+    csharpGenerator.forBlock['se_entity_info_get_property'] = function(block, csharpGenerator) {
+      const entityInfo = csharpGenerator.valueToCode(block, 'ENTITY_INFO', csharpGenerator.ORDER_ATOMIC) || 'new MyDetectedEntityInfo()';
       const property = block.getFieldValue('PROPERTY');
       let code = `${entityInfo}.${property}`;
       if (property === 'Type' || property === 'Relationship') {
         code += '.ToString()';
       }
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
     // --- ГЕНЕРАТОРЫ ТАЙМЕРОВ ---
-    generator.forBlock['se_timer_control'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_timer_control'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const action = block.getFieldValue('ACTION');
       let methodName = (action === 'TriggerNow') ? 'Trigger' : action + 'Countdown';
       return `((${blockCode}) as IMyTimerBlock)?.${methodName}();\n`;
     };
 
-    generator.forBlock['se_timer_set_delay'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
-      const delay = generator.valueToCode(block, 'DELAY', generator.ORDER_ASSIGNMENT) || '0';
+    csharpGenerator.forBlock['se_timer_set_delay'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
+      const delay = csharpGenerator.valueToCode(block, 'DELAY', csharpGenerator.ORDER_ASSIGNMENT) || '0';
       const code = `var t = (${blockCode}) as IMyTimerBlock; if (t != null) t.TriggerDelay = (float)${delay};\n`;
       return code;
     };
 
-    generator.forBlock['se_timer_is_counting_down'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_timer_is_counting_down'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyTimerBlock)?.IsCountingDown ?? false`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
     
     // --- ГЕНЕРАТОРЫ ВЕКТОРОВ ---
-    generator.forBlock['se_vector_create'] = function(block, generator) {
-      const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
-      const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
-      const z = generator.valueToCode(block, 'Z', generator.ORDER_ATOMIC) || '0';
+    csharpGenerator.forBlock['se_vector_create'] = function(block, csharpGenerator) {
+      const x = csharpGenerator.valueToCode(block, 'X', csharpGenerator.ORDER_ATOMIC) || '0';
+      const y = csharpGenerator.valueToCode(block, 'Y', csharpGenerator.ORDER_ATOMIC) || '0';
+      const z = csharpGenerator.valueToCode(block, 'Z', csharpGenerator.ORDER_ATOMIC) || '0';
       const code = `new Vector3D(${x}, ${y}, ${z})`;
-      return [code, generator.ORDER_NEW];
+      return [code, csharpGenerator.ORDER_NEW];
     };
 
-    generator.forBlock['se_vector_get_component'] = function(block, generator) {
-      const vector = generator.valueToCode(block, 'VECTOR', generator.ORDER_MEMBER) || 'Vector3D.Zero';
+    csharpGenerator.forBlock['se_vector_get_component'] = function(block, csharpGenerator) {
+      const vector = csharpGenerator.valueToCode(block, 'VECTOR', csharpGenerator.ORDER_MEMBER) || 'Vector3D.Zero';
       const component = block.getFieldValue('COMPONENT');
       const code = `${vector}.${component}`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_vector_get_length'] = function(block, generator) {
-      const vector = generator.valueToCode(block, 'VECTOR', generator.ORDER_MEMBER) || 'Vector3D.Zero';
+    csharpGenerator.forBlock['se_vector_get_length'] = function(block, csharpGenerator) {
+      const vector = csharpGenerator.valueToCode(block, 'VECTOR', csharpGenerator.ORDER_MEMBER) || 'Vector3D.Zero';
       const code = `${vector}.Length()`;
-      return [code, generator.ORDER_FUNCTION_CALL];
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
     // --- ГЕНЕРАТОРЫ ОРУЖИЯ ---
-    generator.forBlock['se_weapon_shoot_toggle'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_weapon_shoot_toggle'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const action = block.getFieldValue('ACTION');
       return `((${blockCode}) as IMyUserControllableGun)?.ApplyAction("${action}");\n`;
     };
 
-    generator.forBlock['se_weapon_shoot_once'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_weapon_shoot_once'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       return `((${blockCode}) as IMyUserControllableGun)?.ShootOnce();\n`;
     };
 
-    generator.forBlock['se_weapon_get_ammo'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_weapon_get_ammo'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyUserControllableGun)?.GetAmmunitionAmount() ?? 0`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_weapon_is_shooting'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_weapon_is_shooting'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `((${blockCode}) as IMyUserControllableGun)?.IsShooting ?? false`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_me'] = function(block, generator) {
-        return ['Me', generator.ORDER_ATOMIC];
+    csharpGenerator.forBlock['se_me'] = function(block, csharpGenerator) {
+        return ['Me', csharpGenerator.ORDER_ATOMIC];
     };
 
-    generator.forBlock['se_grid_get_property'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'Me';
+    csharpGenerator.forBlock['se_grid_get_property'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'Me';
       const property = block.getFieldValue('PROPERTY');
   
       let defaultValue = 'null';
@@ -564,20 +564,20 @@ ${variableDeclarations}
         }
 
       const code = `((${blockCode})?.CubeGrid.${property} ?? ${defaultValue})`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_storage_write'] = function(block, generator) {
-      const value = generator.valueToCode(block, 'VALUE', generator.ORDER_ATOMIC) || '""';
+    csharpGenerator.forBlock['se_storage_write'] = function(block, csharpGenerator) {
+      const value = csharpGenerator.valueToCode(block, 'VALUE', csharpGenerator.ORDER_ATOMIC) || '""';
       return `Me.Storage = ${value}.ToString();\n`;
     };
 
-    generator.forBlock['se_storage_read'] = function(block, generator) {
-      return ['Me.Storage', generator.ORDER_MEMBER];
+    csharpGenerator.forBlock['se_storage_read'] = function(block, csharpGenerator) {
+      return ['Me.Storage', csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_controller_get_input'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_controller_get_input'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const property = block.getFieldValue('PROPERTY');
   
       let defaultValue = 'default';
@@ -586,39 +586,39 @@ ${variableDeclarations}
       if (property === 'RollIndicator') defaultValue = '0f';
 
       const code = `((${blockCode}) as IMyShipController)?.${property} ?? ${defaultValue}`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
 
-    generator.forBlock['se_vector2d_create'] = function(block, generator) {
-      const x = generator.valueToCode(block, 'X', generator.ORDER_ATOMIC) || '0';
-      const y = generator.valueToCode(block, 'Y', generator.ORDER_ATOMIC) || '0';
+    csharpGenerator.forBlock['se_vector2d_create'] = function(block, csharpGenerator) {
+      const x = csharpGenerator.valueToCode(block, 'X', csharpGenerator.ORDER_ATOMIC) || '0';
+      const y = csharpGenerator.valueToCode(block, 'Y', csharpGenerator.ORDER_ATOMIC) || '0';
       const code = `new Vector2((float)${x}, (float)${y})`;
-      return [code, generator.ORDER_NEW];
+      return [code, csharpGenerator.ORDER_NEW];
     };
 
-    generator.forBlock['se_vector2d_get_component'] = function(block, generator) {
-      const vector = generator.valueToCode(block, 'VECTOR', generator.ORDER_MEMBER) || 'Vector2.Zero';
+    csharpGenerator.forBlock['se_vector2d_get_component'] = function(block, csharpGenerator) {
+      const vector = csharpGenerator.valueToCode(block, 'VECTOR', csharpGenerator.ORDER_MEMBER) || 'Vector2.Zero';
       const component = block.getFieldValue('COMPONENT');
       const code = `${vector}.${component}`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_get_block_position'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_get_block_position'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const code = `(${blockCode})?.GetPosition() ?? Vector3D.Zero`;
-      return [code, generator.ORDER_FUNCTION_CALL];
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_get_block_direction'] = function(block, generator) {
-      const blockCode = generator.valueToCode(block, 'BLOCK', generator.ORDER_ATOMIC) || 'null';
+    csharpGenerator.forBlock['se_get_block_direction'] = function(block, csharpGenerator) {
+      const blockCode = csharpGenerator.valueToCode(block, 'BLOCK', csharpGenerator.ORDER_ATOMIC) || 'null';
       const direction = block.getFieldValue('DIRECTION');
       const code = `(${blockCode})?.WorldMatrix.${direction} ?? Vector3D.Zero`;
-      return [code, generator.ORDER_MEMBER];
+      return [code, csharpGenerator.ORDER_MEMBER];
     };
 
-    generator.forBlock['se_gps_to_vector'] = function(block, generator) {
-      const gpsString = generator.valueToCode(block, 'GPS_STRING', generator.ORDER_ATOMIC) || '""';
+    csharpGenerator.forBlock['se_gps_to_vector'] = function(block, csharpGenerator) {
+      const gpsString = csharpGenerator.valueToCode(block, 'GPS_STRING', csharpGenerator.ORDER_ATOMIC) || '""';
       const code = `((Func<Vector3D>)(() => {
         Vector3D vector;
         if (Vector3D.TryParse((${gpsString}), out vector)) return vector;
@@ -630,36 +630,36 @@ ${variableDeclarations}
         }
         return Vector3D.Zero;
         }))()`;
-      return [code, generator.ORDER_FUNCTION_CALL];
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_vector_distance'] = function(block, generator) {
-      const vec1 = generator.valueToCode(block, 'VEC1', generator.ORDER_ATOMIC) || 'Vector3D.Zero';
-      const vec2 = generator.valueToCode(block, 'VEC2', generator.ORDER_ATOMIC) || 'Vector3D.Zero';
+    csharpGenerator.forBlock['se_vector_distance'] = function(block, csharpGenerator) {
+      const vec1 = csharpGenerator.valueToCode(block, 'VEC1', csharpGenerator.ORDER_ATOMIC) || 'Vector3D.Zero';
+      const vec2 = csharpGenerator.valueToCode(block, 'VEC2', csharpGenerator.ORDER_ATOMIC) || 'Vector3D.Zero';
       const code = `Vector3D.Distance(${vec1}, ${vec2})`;
-      return [code, generator.ORDER_FUNCTION_CALL];
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_vector_normalize'] = function(block, generator) {
-      const vector = generator.valueToCode(block, 'VECTOR', generator.ORDER_ATOMIC) || 'Vector3D.Zero';
+    csharpGenerator.forBlock['se_vector_normalize'] = function(block, csharpGenerator) {
+      const vector = csharpGenerator.valueToCode(block, 'VECTOR', csharpGenerator.ORDER_ATOMIC) || 'Vector3D.Zero';
       const code = `Vector3D.Normalize(${vector})`;
-      return [code, generator.ORDER_FUNCTION_CALL];
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_vector_dot_product'] = function(block, generator) {
-      const vec1 = generator.valueToCode(block, 'VEC1', generator.ORDER_ATOMIC) || 'Vector3D.Zero';
-      const vec2 = generator.valueToCode(block, 'VEC2', generator.ORDER_ATOMIC) || 'Vector3D.Zero';
+    csharpGenerator.forBlock['se_vector_dot_product'] = function(block, csharpGenerator) {
+      const vec1 = csharpGenerator.valueToCode(block, 'VEC1', csharpGenerator.ORDER_ATOMIC) || 'Vector3D.Zero';
+      const vec2 = csharpGenerator.valueToCode(block, 'VEC2', csharpGenerator.ORDER_ATOMIC) || 'Vector3D.Zero';
       const code = `Vector3D.Dot(${vec1}, ${vec2})`;
-      return [code, generator.ORDER_FUNCTION_CALL];
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL];
     };
 
-    generator.forBlock['se_vector_math_op'] = function(block) {
+    csharpGenerator.forBlock['se_vector_math_op'] = function(block) {
   const operator = block.getFieldValue('OP');
   // Меняем приоритет, чтобы скобки расставлялись правильно
   const order = (operator === 'MULTIPLY' || operator === 'DIVIDE') ? 
-                generator.ORDER_MULTIPLICATION : generator.ORDER_ADDITION;
-  const valueA = generator.valueToCode(block, 'A', order) || 'new Vector3D()';
-  const valueB = generator.valueToCode(block, 'B', order) || 'new Vector3D()';
+                csharpGenerator.ORDER_MULTIPLICATION : csharpGenerator.ORDER_ADDITION;
+  const valueA = csharpGenerator.valueToCode(block, 'A', order) || 'new Vector3D()';
+  const valueB = csharpGenerator.valueToCode(block, 'B', order) || 'new Vector3D()';
   let code;
   switch (operator) {
     case 'ADD':
@@ -671,7 +671,7 @@ ${variableDeclarations}
     case 'CROSS':
       // Для функций приоритет обычно самый высокий
       code = `Vector3D.Cross(${valueA}, ${valueB})`;
-      return [code, generator.ORDER_FUNCTION_CALL]; // <-- Особый случай
+      return [code, csharpGenerator.ORDER_FUNCTION_CALL]; // <-- Особый случай
     case 'MULTIPLY':
       code = `${valueA} * ${valueB}`;
       break;
@@ -686,7 +686,7 @@ ${variableDeclarations}
 
     // --- БЛОКИ КАМЕР ---
 
-generator.forBlock['se_camera_raycast'] = function(block, generator) {
+csharpGenerator.forBlock['se_camera_raycast'] = function(block, csharpGenerator) {
     // 1. Определяем имя и код нашей вспомогательной функции
     const functionName = 'CameraRaycastSafe';
     const functionCode = `
@@ -699,27 +699,27 @@ MyDetectedEntityInfo ${functionName}(IMyCameraBlock camera, double distance, flo
 }`;
     
     // 2. Добавляем функцию в "словарь определений". Blockly сам позаботится о дубликатах.
-    generator.definitions_[functionName] = functionCode;
+    csharpGenerator.definitions_[functionName] = functionCode;
 
     // 3. Получаем аргументы из блоков
-    const camera = generator.valueToCode(block, 'CAMERA', generator.ORDER_NONE) || 'null';
-    const distance = generator.valueToCode(block, 'DISTANCE', generator.ORDER_NONE) || '0';
-    const pitch = generator.valueToCode(block, 'PITCH', generator.ORDER_NONE) || '0';
-    const yaw = generator.valueToCode(block, 'YAW', generator.ORDER_NONE) || '0';
+    const camera = csharpGenerator.valueToCode(block, 'CAMERA', csharpGenerator.ORDER_NONE) || 'null';
+    const distance = csharpGenerator.valueToCode(block, 'DISTANCE', csharpGenerator.ORDER_NONE) || '0';
+    const pitch = csharpGenerator.valueToCode(block, 'PITCH', csharpGenerator.ORDER_NONE) || '0';
+    const yaw = csharpGenerator.valueToCode(block, 'YAW', csharpGenerator.ORDER_NONE) || '0';
 
     // 4. Генерируем вызов нашей функции, используя ее известное имя
     const code = `${functionName}(${camera}, ${distance}, (float)${pitch}, (float)${yaw})`;
-    return [code, generator.ORDER_FUNCTION_CALL];
+    return [code, csharpGenerator.ORDER_FUNCTION_CALL];
 };
 
-generator.forBlock['se_camera_raycast_is_valid'] = function(block, generator) {
-    const entityInfo = generator.valueToCode(block, 'ENTITY_INFO', generator.ORDER_MEMBER) || 'new MyDetectedEntityInfo()';
+csharpGenerator.forBlock['se_camera_raycast_is_valid'] = function(block, csharpGenerator) {
+    const entityInfo = csharpGenerator.valueToCode(block, 'ENTITY_INFO', csharpGenerator.ORDER_MEMBER) || 'new MyDetectedEntityInfo()';
     const code = `!${entityInfo}.IsEmpty()`;
-    return [code, generator.ORDER_LOGICAL_NOT];
+    return [code, csharpGenerator.ORDER_LOGICAL_NOT];
 };
 
-generator.forBlock['se_camera_raycast_get_property'] = function(block, generator) {
-    const entityInfo = generator.valueToCode(block, 'ENTITY_INFO', generator.ORDER_MEMBER) || 'new MyDetectedEntityInfo()';
+csharpGenerator.forBlock['se_camera_raycast_get_property'] = function(block, csharpGenerator) {
+    const entityInfo = csharpGenerator.valueToCode(block, 'ENTITY_INFO', csharpGenerator.ORDER_MEMBER) || 'new MyDetectedEntityInfo()';
     const property = block.getFieldValue('PROPERTY');
     
     let code;
@@ -728,29 +728,29 @@ generator.forBlock['se_camera_raycast_get_property'] = function(block, generator
     switch (property) {
         case 'Name':
             code = `${entityInfo}.Name`;
-            order = generator.ORDER_MEMBER;
+            order = csharpGenerator.ORDER_MEMBER;
             break;
         case 'Type':
             code = `${entityInfo}.Type.ToString()`;
-            order = generator.ORDER_FUNCTION_CALL;
+            order = csharpGenerator.ORDER_FUNCTION_CALL;
             break;
         case 'Relationship':
             code = `${entityInfo}.Relationship.ToString()`;
-            order = generator.ORDER_FUNCTION_CALL;
+            order = csharpGenerator.ORDER_FUNCTION_CALL;
             break;
         case 'Velocity':
             code = `${entityInfo}.Velocity`;
-            order = generator.ORDER_MEMBER;
+            order = csharpGenerator.ORDER_MEMBER;
             break;
         case 'HitPosition':
             // HitPosition - это nullable Vector3D (Vector3D?), поэтому нужно .Value
             // Добавим проверку, чтобы избежать ошибки, если попадания не было
              code = `(${entityInfo}.HitPosition.HasValue ? ${entityInfo}.HitPosition.Value : Vector3D.Zero)`;
-            order = generator.ORDER_CONDITIONAL;
+            order = csharpGenerator.ORDER_CONDITIONAL;
             break;
         case 'EntityId':
             code = `${entityInfo}.EntityId`;
-            order = generator.ORDER_MEMBER;
+            order = csharpGenerator.ORDER_MEMBER;
             break;
         default:
             throw new Error('Unknown property for se_camera_raycast_get_property');
@@ -760,4 +760,3 @@ generator.forBlock['se_camera_raycast_get_property'] = function(block, generator
 };
 
 
-}
