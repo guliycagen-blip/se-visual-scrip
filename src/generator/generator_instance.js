@@ -1,7 +1,10 @@
-// src/generator/generator_instance.js  // <-- ИСПРАВЛЕННАЯ ВЕРСИЯ
+// src/generator/generator_instance.js // ПОЛНАЯ, ИСПРАВЛЕННАЯ ВЕРСИЯ
+
 import * as Blockly from 'blockly/core';
 
 export const csharpGenerator = new Blockly.Generator('C#');
+
+// --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ, КОТОРЫХ НЕ ХВАТАЛО ---
 
 /**
  * Initializes the database of variable names.
@@ -21,6 +24,17 @@ csharpGenerator.init = function(workspace) {
 };
 
 /**
+ * Prepend the generated code with the variable definitions.
+ * @param {string} code Generated code.
+ * @return {string} Completed code.
+ */
+csharpGenerator.finish = function(code) {
+  // Convert the definitions dictionary into a list.
+  const definitions = Object.values(csharpGenerator.definitions_);
+  return definitions.join('\n\n') + '\n\n\n' + code;
+};
+
+/**
  * Naked values are generated as literals.
  * This is unlikely to be wanted, so warn.
  * @param {string} line Line of generated code.
@@ -35,7 +49,20 @@ csharpGenerator.scrub_ = function(block, code, thisOnly) {
     return code + nextCode;
 };
 
-// --- Дальше идут константы приоритета, которые у вас уже есть ---
+/**
+ * Enclose the provided string in C#-style quotes.
+ * @param {string} string The string to enclose in quotes.
+ * @return {string} The quoted string.
+ * @protected
+ */
+csharpGenerator.quote_ = function(string) {
+  // TODO: This is a quick hack. It may need to be more robust.
+  // C# strings use @ to indicate verbatim strings, which simplifies escaping.
+  string = string.replace(/"/g, '""');
+  return '@"' + string + '"';
+};
+
+// --- КОНСТАНТЫ ПРИОРИТЕТА ОПЕРАЦИЙ (ORDER), КОТОРЫЕ УЖЕ БЫЛИ ---
 
 csharpGenerator.ORDER_ATOMIC = 0;
 csharpGenerator.ORDER_MEMBER = 2;

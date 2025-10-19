@@ -1,9 +1,9 @@
 // src/csharpGenerator/standard_csharp_csharpGenerator.js
-
+import { csharpGenerator } from './generator_instance.js';
 /**
  * @param {Blockly.csharpGenerator} csharpGenerator The C# csharpGenerator instance.
  */
-export function registerStandardcsharpGenerators(csharpGenerator) {
+ 
   
   // --- ЛОГИКА ---
   csharpGenerator.forBlock['controls_if'] = function(block) {
@@ -379,4 +379,3 @@ csharpGenerator.forBlock['lists_repeat'] = function(block) {
     code += '}\n';
     return code;
   };
-}
