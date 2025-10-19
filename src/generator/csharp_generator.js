@@ -72,9 +72,3 @@ csharpGenerator.quote_ = function(string) {
   return '"' + string + '"';
 };
 
-// 4. РЕГИСТРИРУЕМ ВСЕ НАБОРЫ ГЕНЕРАТОРОВ В ОДНОМ МЕСТЕ.
-
-registerSEGenerators(csharpGenerator);
-registerSEBaseGenerators(csharpGenerator);
-
-// Теперь csharpGenerator полностью настроен и готов к экспорту.
