@@ -33,3 +33,19 @@ ${variablesDeclaration}${bodyCode}
 `;
   return programCode.trim();
 };
+
+// Генератор для блока вывода в консоль
+csharpGenerator.forBlock['console_writeline'] = function(block) {
+  // Получаем значение из подключенного блока. Если ничего не подключено, используем пустую строку.
+  const value_text_to_write = csharpGenerator.valueToCode(block, 'TEXT_TO_WRITE', csharpGenerator.ORDER_ATOMIC) || '""';
+  // Вставляем отступ для красоты
+  const code = `            Console.WriteLine(${value_text_to_write});\n`;
+  return code;
+};
+
+// Генератор для блока чтения из консоли
+csharpGenerator.forBlock['console_readline'] = function(block) {
+  const code = 'Console.ReadLine()';
+  // Этот блок возвращает значение, поэтому результат - массив [код, приоритет операции]
+  return [code, csharpGenerator.ORDER_FUNCTION_CALL];
+};

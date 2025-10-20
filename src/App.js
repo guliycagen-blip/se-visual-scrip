@@ -1,4 +1,4 @@
-// src/App.js
+// /App.js
 
 import React, { useRef, useState, useCallback, useMemo } from 'react';
 import BlocklyComponent from './components/BlocklyComponent';

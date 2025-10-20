@@ -56,5 +56,11 @@ export const consoleToolbox = {
     { kind: 'sep' },
     { kind: 'category', name: 'Переменные', colour: '%{BKY_VARIABLES_HUE}', custom: 'VARIABLE' },
     { kind: 'category', name: 'Функции', colour: '%{BKY_PROCEDURES_HUE}', custom: 'PROCEDURE' },
+    { kind: 'sep' },
+    { kind: "category","name": "Ввод/Вывод","colour": "#5b80a5","contents": [{ "kind": "block", "type": "console_writeline" },{ "kind": "block", "type": "console_readline" }]},
+    { kind: 'sep' },
+    {"kind": "category","name": "Программа","colour": "#5b6770","contents": [{ "kind": "block", "type": "program_main" }]},
+    { kind: 'sep' },
+
   ]
 };
