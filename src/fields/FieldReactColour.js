@@ -1,4 +1,25 @@
-// Содержимое файла FieldReactColour.js
+// src/fields/FieldReactColour.js
+
 import * as Blockly from 'blockly/core';
-export class FieldReactColour extends Blockly.Field { SERIALIZABLE = true; EDITABLE = true; static fromJson(json) { return new FieldReactColour(json['colour']); } constructor(value = '#ffffff', validator = null) { super(value, validator); } initView() { this.fieldGroup_ = Blockly.utils.dom.createSvgElement('g', {}, this.getSvgRoot()); this.borderElement_ = Blockly.utils.dom.createSvgElement('rect', { 'rx': 4, 'ry': 4, 'width': 24, 'height': 24, 'fill': '#fff', 'stroke': '#ccc' }, this.fieldGroup_); this.colourElement_ = Blockly.utils.dom.createSvgElement('rect', { 'rx': 2, 'ry': 2, 'x': 2, 'y': 2, 'width': 20, 'height': 20 }, this.fieldGroup_); this.getSvgRoot().style.cursor = 'pointer'; this.render_(); } render_() { if (!this.colourElement_) return; this.colourElement_.setAttribute('fill', this.getValue()); } showEditor_() { const openPicker = this.getSourceBlock()?.workspace?.openReactColourPicker; if (openPicker && typeof openPicker === 'function') { openPicker(this.getValue(), (newValue) => { this.setValue(newValue); }); } else { console.error('Критическая ошибка: функция openReactColourPicker не прикреплена к workspace!'); } } }
+// --- ИЗМЕНЕНИЕ 1: Импортируем базовый класс напрямую ---
+import { FieldColour } from 'blockly/core';
+
+// --- ИЗМЕНЕНИЕ 2: Наследуемся от импортированного класса, а не от Blockly.FieldColour ---
+export class FieldReactColour extends FieldColour {
+  static fromJson(options) {
+    return new FieldReactColour(options.colour, undefined, options);
+  }
+
+  showEditor_() {
+    if (FieldReactColour.outsider) {
+      FieldReactColour.outsider(this.getValue(), (newColour) => {
+        this.setValue(newColour);
+      });
+    } else {
+      super.showEditor_();
+    }
+  }
+}
+
+// --- ИЗМЕНЕНИЕ 3: Используем современный способ регистрации поля ---
 Blockly.fieldRegistry.register('field_react_colour', FieldReactColour);

@@ -1,4 +1,4 @@
-// Содержимое файла FieldColour.js без изменений
+// src/firlds/FieldColour.js 
 import * as Blockly from 'blockly/core';
 import React from 'react';
 import { createRoot } from 'react-dom/client';

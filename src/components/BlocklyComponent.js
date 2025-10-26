@@ -12,6 +12,8 @@ import { csharpGenerator } from '../generator/csharp_generator';
 import 'blockly/blocks';
 import '../blocks/se_blocks';
 import '../blocks/se_base_blocks';
+import * as Ru from 'blockly/msg/ru';
+Blockly.setLocale(Ru);
 
 const BlocklyComponent = forwardRef(({ onCodeChange, openReactColourPicker, toolbox, initialXml }, ref) => {
     const blocklyDiv = useRef(null);

@@ -1,3 +1,5 @@
+//src/components/ColorPickerModal.js
+
 import React, { useState, useCallback } from 'react';
 import { SketchPicker } from 'react-color';
 

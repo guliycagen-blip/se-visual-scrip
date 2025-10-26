@@ -1,4 +1,4 @@
-/* Содержимое файла App.css без изменений */
+/* src/App.css */
 body, html, #root { margin: 0; padding: 0; height: 100%; font-family: sans-serif; }
 .App { display: flex; flex-direction: column; height: 100vh; background-color: #2d2d2d; color: white; }
 .main-container { display: flex; flex-grow: 1; overflow: hidden; }

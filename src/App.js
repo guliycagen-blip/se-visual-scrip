@@ -1,39 +1,29 @@
 // /App.js
 
-import React, { useRef, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import BlocklyComponent from './components/BlocklyComponent';
 import CodeDisplay from './components/CodeDisplay';
 import { ColorPickerModal } from './components/ColorPickerModal';
 import FAQPage from './components/FAQPage';
 import './App.css';
 
-import ConsolePanel from './console/ConsolePanel';
+import ConsoleApp from './console_app/ConsoleApp';
 
-// --- БЛОК ИНИЦИАЛИЗАЦИИ BLOCKLY ---
+// --- БЛОК ИНИЦИАЛИЗАЦИИ УДАЛЕН ---
+// Остались только импорты, которые мы используем напрямую в коде компонента.
 import * as Blockly from 'blockly/core';
-import 'blockly/blocks';
-import './fields/FieldReactColour.js';
-import './blocks/se_blocks.js';
-import './blocks/se_base_blocks.js';
-import './blocks/console_blocks.js';
-import './generator/csharp/console_generator.js';
-import { seToolbox, consoleToolbox } from './toolboxConfig';
+import { seToolbox } from './toolboxConfig';
 import { ERROR_MESSAGE_STRING } from './generator/standard_csharp_generator.js';
-import * as Ru from 'blockly/msg/ru';
 
-Blockly.setLocale(Ru);
-// --- КОНЕЦ БЛОКА ИНИЦИАЛИЗАЦИИ ---
 
 const SE_INITIAL_XML =
   '<xml xmlns="https://developers.google.com/blockly/xml">' +
   '  <block type="se_program_structure" deletable="false" movable="false" x="50" y="50"></block>' +
   '</xml>';
-const CONSOLE_INITIAL_XML =
-  '<xml xmlns="https://developers.google.com/blockly/xml">' +
-  '  <block type="program_main" deletable="false" movable="false" x="50" y="50"></block>' +
-  '</xml>';
 
 function App() {
+  // ... весь остальной код компонента App остается без изменений ...
+  // (здесь ваш код для const [code, setCode] = useState(''); и т.д.)
   const [code, setCode] = useState('');
   const blocklyComponentRef = useRef(null);
   const [isPickerOpen, setPickerOpen] = useState(false);
@@ -41,15 +31,12 @@ function App() {
   const [pickerCallback, setPickerCallback] = useState(null);
   const [showFaq, setShowFaq] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('Копировать');
-  const [mode, setMode] = useState('se');
+  
+  const [showConsoleMode, setShowConsoleMode] = useState(false);
 
-  const { toolbox, initialXml } = useMemo(() => {
-    if (mode === 'se') {
-      return { toolbox: seToolbox, initialXml: SE_INITIAL_XML };
-    } else {
-      return { toolbox: consoleToolbox, initialXml: CONSOLE_INITIAL_XML };
-    }
-  }, [mode]);
+  const toolbox = seToolbox;
+  const initialXml = SE_INITIAL_XML;
+  const mode = 'se';
 
   const openColorPicker = useCallback((initialColor, callback) => {
     setPickerInitialColor(initialColor);
@@ -63,29 +50,20 @@ function App() {
     }
   };
 
-  // --- ИЗМЕНЕНИЕ: Функция копирования заменена на версию без 'confirm' для исправления ошибки ESLint ---
   const handleCopyClick = () => {
-    // Просто копируем код. Визуальные предупреждения на блоках и в коде уже информируют пользователя.
     navigator.clipboard.writeText(code)
       .then(() => {
-        // Если в коде есть ошибка, кнопка покажет это, но код все равно скопируется.
         if (code.includes(ERROR_MESSAGE_STRING)) {
           setCopyButtonText('Скопировано с ошибками');
         } else {
           setCopyButtonText('Скопировано!');
         }
-        
-        // Возвращаем текст обратно через 2 секунды
-        setTimeout(() => {
-          setCopyButtonText('Копировать');
-        }, 2000);
+        setTimeout(() => setCopyButtonText('Копировать'), 2000);
       })
       .catch(err => {
         console.error('Ошибка копирования: ', err);
         setCopyButtonText('Ошибка копирования!');
-         setTimeout(() => {
-          setCopyButtonText('Копировать');
-        }, 2000);
+         setTimeout(() => setCopyButtonText('Копировать'), 2000);
       });
   };
 
@@ -113,15 +91,19 @@ function App() {
     return <FAQPage onBack={() => setShowFaq(false)} />;
   }
 
+  if (showConsoleMode) {
+    return <ConsoleApp onExit={() => setShowConsoleMode(false)} />;
+  }
+
   return (
     <div className="App">
       <header className="app-header">
         <h1>SE Blockly V2</h1>
         <div className="mode-switcher">
-          <button className={mode === 'se' ? 'active' : ''} onClick={() => setMode('se')}>
+          <button className="active">
             Скрипты Space Engineers
           </button>
-          <button className={mode === 'console' ? 'active' : ''} onClick={() => setMode('console')}>
+          <button onClick={() => setShowConsoleMode(true)}>
             Консольная программа C#
           </button>
         </div>
@@ -134,7 +116,7 @@ function App() {
             openReactColourPicker={openColorPicker}
             toolbox={toolbox}
             initialXml={initialXml}
-            key={mode}
+            key={mode} 
           />
         </div>
         <div className="code-wrapper">
@@ -147,7 +129,6 @@ function App() {
             )}
           </div>
           <CodeDisplay code={code} />
-           {mode === 'console' && <ConsolePanel csharpCode={code} />}
         </div>
       </div>
       <div className="buttons-panel">
