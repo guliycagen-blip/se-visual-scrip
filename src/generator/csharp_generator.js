@@ -8,6 +8,9 @@ import { csharpGenerator } from './generator_instance.js';
 // Мы не используем ничего из этих файлов напрямую здесь, но сам факт их импорта
 // заставляет их код выполниться.
 import './standard_csharp_generator.js';
+
+import './csharp/console_generator.js';
+
 import './se_csharp_generator.js';
 import './se_csharp_base_generator.js';
 import './csharp/console_generator.js';

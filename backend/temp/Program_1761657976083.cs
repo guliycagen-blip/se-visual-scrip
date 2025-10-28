@@ -1,0 +1,23 @@
+object a;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace MyBlocklyApp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            object a;
+              a = Console.ReadLine();
+              if (0 == 0) {
+                  Console.WriteLine(a);
+              }
+
+        }
+    }
+}

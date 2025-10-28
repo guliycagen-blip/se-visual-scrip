@@ -1,4 +1,4 @@
-// /App.js
+// src/App.js
 
 import React, { useRef, useState, useCallback } from 'react';
 import BlocklyComponent from './components/BlocklyComponent';
@@ -7,14 +7,13 @@ import { ColorPickerModal } from './components/ColorPickerModal';
 import FAQPage from './components/FAQPage';
 import './App.css';
 
-import ConsoleApp from './console_app/ConsoleApp';
+// ИЗМЕНЕНИЕ 1: Импортируем ConsoleView из новой, правильной папки
+import ConsoleView from './console/ConsoleView';
 
-// --- БЛОК ИНИЦИАЛИЗАЦИИ УДАЛЕН ---
-// Остались только импорты, которые мы используем напрямую в коде компонента.
+// ... импорты Blockly, seToolbox и т.д. остаются без изменений ...
 import * as Blockly from 'blockly/core';
 import { seToolbox } from './toolboxConfig';
 import { ERROR_MESSAGE_STRING } from './generator/standard_csharp_generator.js';
-
 
 const SE_INITIAL_XML =
   '<xml xmlns="https://developers.google.com/blockly/xml">' +
@@ -22,8 +21,6 @@ const SE_INITIAL_XML =
   '</xml>';
 
 function App() {
-  // ... весь остальной код компонента App остается без изменений ...
-  // (здесь ваш код для const [code, setCode] = useState(''); и т.д.)
   const [code, setCode] = useState('');
   const blocklyComponentRef = useRef(null);
   const [isPickerOpen, setPickerOpen] = useState(false);
@@ -34,6 +31,7 @@ function App() {
   
   const [showConsoleMode, setShowConsoleMode] = useState(false);
 
+  // ... остальная часть вашего кода (функции openColorPicker, handleCopyClick и т.д.) ...
   const toolbox = seToolbox;
   const initialXml = SE_INITIAL_XML;
   const mode = 'se';
@@ -90,9 +88,10 @@ function App() {
   if (showFaq) {
     return <FAQPage onBack={() => setShowFaq(false)} />;
   }
-
+  
+  // ИЗМЕНЕНИЕ 2: Используем ConsoleView вместо ConsoleApp
   if (showConsoleMode) {
-    return <ConsoleApp onExit={() => setShowConsoleMode(false)} />;
+    return <ConsoleView onExit={() => setShowConsoleMode(false)} />;
   }
 
   return (

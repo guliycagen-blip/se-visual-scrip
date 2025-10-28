@@ -1,0 +1,159 @@
+/* src/console/ConsoleView.css */
+
+/* --- Общий контейнер для всего режима консоли --- */
+.console-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #282c34; /* Более темный фон */
+  color: #abb2bf;
+}
+
+/* --- Шапка с заголовком и кнопкой выхода --- */
+.console-header {
+  padding: 10px 20px;
+  background-color: #21252b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  border-bottom: 1px solid #3c424f;
+}
+
+.console-header h1 {
+  margin: 0;
+  font-size: 1.4em;
+  color: #fff;
+}
+
+.exit-button {
+  padding: 8px 16px;
+  border: 1px solid #61afef;
+  background-color: transparent;
+  color: #61afef;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.exit-button:hover {
+  background-color: #61afef;
+  color: #fff;
+}
+
+/* --- Основная область с двумя колонками --- */
+.main-container {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow: hidden; /* Предотвращает выход контента за пределы */
+}
+
+/* --- Левая колонка с Blockly --- */
+.blockly-wrapper {
+  flex: 0 1 60%; /* Занимает 60% ширины */
+  position: relative;
+  border-right: 1px solid #3c424f;
+}
+
+/* --- Правая колонка с кодом и консолью --- */
+.right-panel {
+  flex: 0 1 40%; /* Занимает 40% ширины */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- Контейнер для сгенерированного кода --- */
+.code-wrapper {
+  flex: 1 1 50%; /* Занимает 50% высоты правой панели */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-bottom: 1px solid #3c424f;
+}
+
+.code-header {
+  padding: 10px;
+  background-color: #21252b;
+  flex-shrink: 0;
+}
+
+.code-header h2 {
+  margin: 0;
+  font-size: 1em;
+  color: #fff;
+}
+
+.console-header-bar {
+  padding: 5px 10px;
+  background-color: #21252b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.console-area {
+  flex: 1 1 50%; /* Занимает 50% высоты правой панели */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.console-input-area {
+  height: 100px; /* Высота поля для ввода */
+  flex-shrink: 0; /* Не сжиматься */
+  background-color: #2c313a;
+  color: #abb2bf;
+  border: none;
+  border-top: 1px solid #3c424f;
+  border-bottom: 1px solid #3c424f;
+  padding: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  resize: vertical; /* Позволяет менять высоту */
+}
+
+.console-input-area:focus {
+  outline: 1px solid #61afef;
+}
+
+
+.console-header-bar span {
+  font-weight: bold;
+  color: #fff;
+}
+
+.run-button {
+  padding: 6px 12px;
+  background-color: #98c379; /* Зеленый */
+  color: #21252b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.run-button:hover {
+  background-color: #aee092;
+}
+
+.run-button:disabled {
+  background-color: #5c6370;
+  cursor: not-allowed;
+}
+
+/* --- Область вывода консоли --- */
+.console-output {
+  flex-grow: 1;
+  background-color: #282c34;
+  padding: 10px;
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  white-space: pre-wrap; /* Перенос строк */
+  word-wrap: break-word; /* Перенос длинных слов */
+  overflow-y: auto; /* Полоса прокрутки, если много текста */
+}

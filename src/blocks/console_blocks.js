@@ -13,8 +13,8 @@ Blockly.Blocks['program_main'] = {
         .setCheck(null);
     this.setColour(programColour);
     this.setTooltip("Главный блок для создания полноценной программы. Весь код внутри будет помещен в метод Main().");
-    this.setDeletable(false); // Этот блок нельзя удалить
-    this.setMovable(false);  // и нельзя передвинуть
+    this.setDeletable(false);
+    this.setMovable(false);
     this.setPreviousStatement(false, null);
     this.setNextStatement(false, null);
   }
@@ -22,7 +22,7 @@ Blockly.Blocks['program_main'] = {
 
 Blockly.Blocks['console_writeline'] = {
   init: function() {
-    this.appendValueInput("TEXT_TO_WRITE")
+    this.appendValueInput("VALUE") // <-- ИЗМЕНЕНИЕ ЗДЕСЬ: "TEXT_TO_WRITE" заменено на "VALUE"
         .setCheck(["String", "Number", "Boolean"])
         .appendField("вывести в консоль");
     this.setPreviousStatement(true, null);
@@ -38,6 +38,15 @@ Blockly.Blocks['console_readline'] = {
     this.appendDummyInput()
         .appendField("прочитать строку из консоли");
     this.setOutput(true, "String");
+
+    // --- ИЗМЕНЕНИЕ ЗДЕСЬ ---
+    // Явно указываем, что этот блок НЕ МОЖЕТ иметь соединений сверху или снизу.
+    // Это делает его определение абсолютно однозначным для движка Blockly
+    // и не позволит пользователю "бросить" его на рабочую область как отдельную команду.
+    this.setPreviousStatement(false, null);
+    this.setNextStatement(false, null);
+    // -------------------------
+
     this.setColour(ioColour);
     this.setTooltip("Читает следующую строку из консоли и возвращает ее как текст.");
     this.setHelpUrl("");

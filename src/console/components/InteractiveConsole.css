@@ -1,0 +1,90 @@
+/* src/console/components/InteractiveConsole.css */
+
+/* Главный контейнер теперь просто flex-контейнер без отступов */
+.interactive-console {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #1e1e1e; /* Общий фон */
+}
+
+/* НОВЫЕ СТИЛИ: Окно для сгенерированного кода */
+.console-code-display {
+  height: 50%; /* Занимает верхнюю половину */
+  background-color: #252526; /* Чуть другой фон для разделения */
+  color: #d4d4d4;
+  font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+  font-size: 14px;
+  border-bottom: 2px solid #333;
+  overflow: auto; /* Добавляем скролл, если код большой */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.console-code-display pre {
+  margin: 0;
+  white-space: pre-wrap; /* Перенос строк */
+  word-break: break-all;
+}
+
+/* НОВЫЕ СТИЛИ: Контейнер для интерактивной части */
+.console-runtime {
+  display: flex;
+  flex-direction: column;
+  height: 50%; /* Занимает нижнюю половину */
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* СТАРЫЕ СТИЛИ (работают внутри .console-runtime) */
+.console-output {
+  flex-grow: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+  font-size: 14px;
+}
+
+.log-entry {
+  margin-bottom: 5px;
+}
+
+.log-prompt {
+  margin-right: 8px;
+}
+
+.log-command .log-prompt,
+.log-command span {
+  color: #9cdcfe;
+}
+
+.log-error span {
+  color: #f44747;
+}
+
+.log-response span {
+  color: #d4d4d4;
+}
+
+.console-input-container {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #333;
+  padding-top: 5px;
+  margin-top: 5px;
+}
+
+.console-input-container > span {
+  margin-right: 8px;
+}
+
+.console-input {
+  flex-grow: 1;
+  background: none;
+  border: none;
+  color: #d4d4d4;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+}

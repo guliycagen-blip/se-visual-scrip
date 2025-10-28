@@ -4,6 +4,22 @@ import * as Blockly from 'blockly/core';
 
 export const csharpGenerator = new Blockly.Generator('C#');
 
+
+csharpGenerator.ORDER_ATOMIC = 0;             // 0 "" ...
+csharpGenerator.ORDER_MEMBER = 2;             // . []
+csharpGenerator.ORDER_FUNCTION_CALL = 2;      // ()
+csharpGenerator.ORDER_UNARY_PREFIX = 4;       // - ! ~
+csharpGenerator.ORDER_MULTIPLICATIVE = 5;     // * / %
+csharpGenerator.ORDER_ADDITIVE = 6;           // + -
+csharpGenerator.ORDER_RELATIONAL = 8;         // < <= > >=
+csharpGenerator.ORDER_EQUALITY = 9;           // == !=
+csharpGenerator.ORDER_LOGICAL_AND = 13;       // &&
+csharpGenerator.ORDER_LOGICAL_OR = 14;        // ||
+csharpGenerator.ORDER_ASSIGNMENT = 16;        // =
+csharpGenerator.ORDER_NONE = 99;              // (...)
+
+
+
 csharpGenerator.init = function(workspace) {
   // 1. Создаем пустые словари для определений и имен переменных (стандартный код)
   csharpGenerator.definitions_ = Object.create(null);
@@ -54,18 +70,3 @@ csharpGenerator.quote_ = function(string) {
 };
 
 // ... КОНСТАНТЫ ПРИОРИТЕТА ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ ...
-csharpGenerator.ORDER_ATOMIC = 0;
-// ... и так далее ...
-csharpGenerator.ORDER_MEMBER = 2;
-csharpGenerator.ORDER_UNARY_POSTFIX = 3;
-csharpGenerator.ORDER_UNARY_PREFIX = 4;
-csharpGenerator.ORDER_MULTIPLICATIVE = 5.1;
-csharpGenerator.ORDER_ADDITIVE = 5.2;
-csharpGenerator.ORDER_SHIFT = 6;
-csharpGenerator.ORDER_RELATIONAL = 7;
-csharpGenerator.ORDER_EQUALITY = 8;
-csharpGenerator.ORDER_LOGICAL_AND = 12;
-csharpGenerator.ORDER_LOGICAL_OR = 13;
-csharpGenerator.ORDER_CONDITIONAL = 14;
-csharpGenerator.ORDER_ASSIGNMENT = 15;
-csharpGenerator.ORDER_NONE = 99;
